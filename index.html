@@ -359,60 +359,64 @@ input{outline:none;border:none}
 </head>
 <body>
 <script>
-// ====== Local Storage Database (no backend needed) ======
+// ====== Supabase REST API (no SDK needed, uses fetch) ======
+const SUPABASE_URL = 'https://pnsqrgutvwogjijlyuiq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2vD5BRO11X7CDpJZT59IDQ_CcsPnQjS';
 const DB = {
-  _students: null,
-  _records: null,
-  _admins: [{id:1, account:'xuejin', password:'xuejin2027'}],
-
-  load() {
-    if (this._students === null) {
-      try { this._students = JSON.parse(localStorage.getItem('xuejin_students') || '[]'); }
-      catch(e) { this._students = []; }
-      if (this._students.length === 0) {
-        this._students = [{id:1, name:'测试同学', phone:'13800000001', password:'123456', category:'construction', created_at:new Date().toISOString()}];
-        this.save();
-      }
-    }
-    if (this._records === null) {
-      try { this._records = JSON.parse(localStorage.getItem('xuejin_records') || '[]'); }
-      catch(e) { this._records = []; }
-    }
+  async findStudent(phone, password) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/students?select=*&phone=eq.${encodeURIComponent(phone)}&password=eq.${encodeURIComponent(password)}`, {
+      headers: { 'apikey': SUPABASE_KEY }
+    });
+    const data = await res.json();
+    return (data && data.length > 0) ? data[0] : null;
   },
-  save() {
-    localStorage.setItem('xuejin_students', JSON.stringify(this._students));
-    localStorage.setItem('xuejin_records', JSON.stringify(this._records));
+  async findStudentByPhone(phone) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/students?select=id&phone=eq.${encodeURIComponent(phone)}`, {
+      headers: { 'apikey': SUPABASE_KEY }
+    });
+    const data = await res.json();
+    return (data && data.length > 0) ? data[0] : null;
   },
-  getStudents() { this.load(); return this._students; },
-  getRecords() { this.load(); return this._records; },
-  findStudent(phone, password) {
-    this.load();
-    return this._students.find(s => s.phone === phone && s.password === password) || null;
+  async addStudent(name, phone, password, category) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/students`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({ name, phone, password, category })
+    });
+    const data = await res.json();
+    return (data && data.length > 0) ? data[0] : null;
   },
-  findStudentByPhone(phone) {
-    this.load();
-    return this._students.find(s => s.phone === phone) || null;
+  async getRecordsByStudent(studentId) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/quiz_records?select=*&student_id=eq.${studentId}`, {
+      headers: { 'apikey': SUPABASE_KEY }
+    });
+    return await res.json() || [];
   },
-  addStudent(name, phone, password, category) {
-    this.load();
-    const s = {id: Date.now(), name, phone, password, category, created_at: new Date().toISOString()};
-    this._students.push(s);
-    this.save();
-    return s;
+  async addRecord(record) {
+    await fetch(`${SUPABASE_URL}/rest/v1/quiz_records`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(record)
+    });
   },
-  getRecordsByStudent(studentId) {
-    this.load();
-    return this._records.filter(r => r.student_id === studentId);
+  async getStudents() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/students?select=*&order=created_at.desc`, {
+      headers: { 'apikey': SUPABASE_KEY }
+    });
+    return await res.json() || [];
   },
-  addRecord(record) {
-    this.load();
-    record.id = Date.now();
-    record.created_at = new Date().toISOString();
-    this._records.unshift(record);
-    this.save();
+  async getRecords() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/quiz_records?select=*&order=created_at.desc`, {
+      headers: { 'apikey': SUPABASE_KEY }
+    });
+    return await res.json() || [];
   },
-  findAdmin(account, password) {
-    return this._admins.find(a => a.account === account && a.password === password) || null;
+  async findAdmin(account, password) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/admins?select=*&account=eq.${encodeURIComponent(account)}&password=eq.${encodeURIComponent(password)}`, {
+      headers: { 'apikey': SUPABASE_KEY }
+    });
+    const data = await res.json();
+    return (data && data.length > 0) ? data[0] : null;
   }
 };
 </script>
@@ -1416,7 +1420,7 @@ async function init(){
   }
 }
 
-// ====== Auth (Local Storage) ======
+// ====== Auth (Supabase REST API) ======
 async function handleRegister(){
   const name = document.getElementById('reg-name').value.trim();
   const phone = document.getElementById('reg-phone').value.trim();
@@ -1447,7 +1451,7 @@ async function handleRegister(){
   btn.textContent = '注册中...';
 
   // Check if phone exists
-  const existing = DB.findStudentByPhone(phone);
+  const existing = await DB.findStudentByPhone(phone);
   if(existing){
     errEl.textContent='该手机号已注册';
     errEl.classList.add('show');
@@ -1457,7 +1461,7 @@ async function handleRegister(){
   }
 
   // Insert
-  const data = DB.addStudent(name, phone, password, cat);
+  const data = await DB.addStudent(name, phone, password, cat);
   btn.disabled = false;
   btn.textContent = '注 册';
 
@@ -1486,7 +1490,7 @@ async function handleLogin(){
   btn.disabled = true;
   btn.textContent = '登录中...';
 
-  const data = DB.findStudent(phone, password);
+  const data = await DB.findStudent(phone, password);
 
   btn.disabled = false;
   btn.textContent = '登 录';
@@ -1519,7 +1523,7 @@ async function handleAdminLogin(){
   btn.disabled = true;
   btn.textContent = '登录中...';
 
-  const data = DB.findAdmin(account, password);
+  const data = await DB.findAdmin(account, password);
 
   btn.disabled = false;
   btn.textContent = '管理端登录';
@@ -1556,8 +1560,8 @@ function showPage(id){
 async function showHome(){
   document.getElementById('home-username').textContent = currentUser.name;
   
-  // Stats from Local Storage
-  const myRecords = DB.getRecordsByStudent(currentUser.id);
+  // Stats from Supabase
+  const myRecords = await DB.getRecordsByStudent(currentUser.id);
   const totalQ = myRecords.reduce((s,r)=>s+r.total,0);
   const avgAcc = myRecords.length>0 ? Math.round(myRecords.reduce((s,r)=>s+r.accuracy,0)/myRecords.length) : 0;
   
@@ -1789,8 +1793,8 @@ function submitQuiz(){
   const minutes = Math.floor(elapsed/60);
   const seconds = elapsed%60;
   
-  // Save record to Local Storage
-  DB.addRecord({
+  // Save record to Supabase
+  await DB.addRecord({
     student_id:currentUser.id,
     student_name:currentUser.name,
     subject:quizState.subject,
@@ -1851,11 +1855,11 @@ function showResult(correct,total,accuracy,minutes,seconds,wrongQuestions){
   showPage('page-result');
 }
 
-// ====== Admin (Local Storage) ======
+// ====== Admin (Supabase) ======
 async function showAdmin(){
-  // Fetch all students and records from Local Storage
-  const allUsers = DB.getStudents().slice().reverse();
-  const allRecords = DB.getRecords();
+  // Fetch all students and records from Supabase
+  const allUsers = await DB.getStudents();
+  const allRecords = await DB.getRecords();
   
   // Summary
   document.getElementById('admin-student-count').textContent = allUsers.length;
