@@ -1762,7 +1762,7 @@ function nextQuestion(){
   }
 }
 
-function submitQuiz(){
+async function submitQuiz(){
   const unanswered = quizState.answers.filter(a=>a===null || a.length===0).length;
   if(unanswered > 0){
     if(!confirm(`还有${unanswered}道题未作答，确定要交卷吗？`)) return;
