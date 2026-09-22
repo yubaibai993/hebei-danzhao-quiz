@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>学锦教育 · 河北单招刷题平台</title>
+<style>
+/* ===== Reset & Base ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#1E6DB5;
+  --primary-light:#E3F2FD;
+  --accent:#F5A623;
+  --accent-light:#FFF3E0;
+  --dark:#2C2C2C;
+  --body:#4A4A4A;
+  --gray:#8A9BA8;
+  --bg:#F5F7FA;
+  --white:#FFFFFF;
+  --success:#4CAF50;
+  --success-bg:#E8F5E9;
+  --error:#F44336;
+  --error-bg:#FDE8E8;
+  --border:#E0E6ED;
+  --radius:12px;
+  --shadow:0 2px 12px rgba(0,0,0,0.06);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.12);
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--dark);
+  line-height:1.6;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+input,button,select{font-family:inherit;font-size:inherit}
+button{cursor:pointer;border:none;background:none}
+input{outline:none;border:none}
+
+/* ===== App Container ===== */
+#app{max-width:640px;margin:0 auto;min-height:100vh;background:var(--white);position:relative}
+
+/* ===== Pages ===== */
+.page{display:none!important;padding:16px;min-height:100vh}
+.page.active{display:block!important}
+.page.auth-page.active{display:flex!important}
+
+/* ===== Header ===== */
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:var(--white);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+}
+.app-header .logo{
+  font-size:18px;font-weight:700;color:var(--primary);
+  display:flex;align-items:center;gap:8px;
+}
+.app-header .logo img{
+  width:40px;height:40px;border-radius:8px;object-fit:cover;
+}
+.app-header .logo .dot{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(180deg,var(--accent) 50%,var(--primary) 50%);
+  display:inline-flex;align-items:center;justify-content:center;
+  color:white;font-size:14px;font-weight:700;
+}
+.app-header .user-info{
+  font-size:13px;color:var(--gray);
+  display:flex;align-items:center;gap:8px;
+}
+.app-header .logout-btn{
+  color:var(--gray);font-size:13px;padding:4px 10px;
+  border-radius:6px;transition:all .2s;
+}
+.app-header .logout-btn:hover{background:var(--error-bg);color:var(--error)}
+
+/* ===== Auth Pages ===== */
+.auth-page{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;padding:32px 24px;
+}
+.auth-logo{
+  width:100px;height:100px;border-radius:20px;
+  object-fit:cover;margin-bottom:16px;
+}
+.auth-logo-text{
+  font-size:22px;font-weight:700;color:var(--primary);margin-bottom:4px;
+}
+.auth-title{font-size:22px;font-weight:700;color:var(--primary);margin-bottom:4px}
+.auth-subtitle{font-size:14px;color:var(--gray);margin-bottom:32px;text-align:center}
+.auth-card{
+  width:100%;max-width:380px;
+  background:var(--white);border-radius:var(--radius);
+  padding:24px;box-shadow:var(--shadow);
+}
+.input-group{margin-bottom:16px}
+.input-group label{display:block;font-size:13px;color:var(--body);margin-bottom:6px;font-weight:500}
+.input-group input{
+  width:100%;height:44px;padding:0 14px;
+  border:1.5px solid var(--border);border-radius:8px;
+  font-size:15px;color:var(--dark);
+  transition:border-color .2s;
+}
+.input-group input:focus{border-color:var(--primary)}
+.input-group input::placeholder{color:var(--gray)}
+.btn-primary{
+  width:100%;height:46px;background:var(--primary);color:white;
+  border-radius:8px;font-size:16px;font-weight:600;
+  transition:all .2s;
+}
+.btn-primary:hover{background:#1A5A9C;transform:translateY(-1px);box-shadow:0 4px 16px rgba(30,109,181,0.3)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{background:var(--gray);cursor:not-allowed;transform:none}
+.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--gray)}
+.auth-switch a{color:var(--primary);font-weight:500;text-decoration:none}
+.auth-error{
+  background:var(--error-bg);color:var(--error);
+  padding:8px 12px;border-radius:8px;font-size:13px;
+  margin-bottom:12px;display:none;
+}
+.auth-error.show{display:block}
+
+/* ===== Home Page ===== */
+.home-banner{
+  background:linear-gradient(135deg,var(--primary),#2196F3);
+  border-radius:var(--radius);padding:24px 20px;
+  color:white;margin-bottom:20px;
+}
+.home-banner h2{font-size:20px;margin-bottom:6px}
+.home-banner p{font-size:13px;opacity:.9}
+.home-stats{
+  display:flex;gap:12px;margin-bottom:20px;
+}
+.stat-card{
+  flex:1;background:var(--white);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);text-align:center;
+}
+.stat-card .num{font-size:24px;font-weight:700;color:var(--primary)}
+.stat-card .label{font-size:12px;color:var(--gray);margin-top:4px}
+.section-title{
+  font-size:16px;font-weight:600;color:var(--dark);
+  margin-bottom:12px;padding-left:4px;
+  border-left:3px solid var(--accent);padding-left:8px;
+}
+
+/* Category Cards */
+.category-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.category-card{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--white);border-radius:var(--radius);
+  padding:14px 16px;box-shadow:var(--shadow);
+  transition:all .2s;cursor:pointer;
+}
+.category-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px)}
+.category-card .cat-info{display:flex;align-items:center;gap:12px}
+.category-card .cat-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:700;color:white;
+}
+.category-card .cat-name{font-size:15px;font-weight:600;color:var(--dark)}
+.category-card .cat-desc{font-size:12px;color:var(--gray);margin-top:2px}
+.category-card .arrow{color:var(--gray);font-size:18px}
+
+/* Subject Cards */
+.subject-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.subject-card{
+  background:var(--white);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);
+  text-align:center;transition:all .2s;cursor:pointer;
+}
+.subject-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.subject-card .subj-icon{font-size:28px;margin-bottom:8px}
+.subject-card .subj-name{font-size:14px;font-weight:600;color:var(--dark)}
+.subject-card .subj-meta{font-size:11px;color:var(--gray);margin-top:4px}
+
+/* ===== Config Page ===== */
+.config-section{margin-bottom:24px}
+.config-label{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:10px}
+.option-row{display:flex;gap:8px;flex-wrap:wrap}
+.option-btn{
+  flex:1;min-width:80px;height:44px;
+  border:1.5px solid var(--border);border-radius:8px;
+  font-size:14px;color:var(--body);font-weight:500;
+  transition:all .2s;background:var(--white);
+}
+.option-btn.active{
+  border-color:var(--primary);background:var(--primary-light);
+  color:var(--primary);font-weight:600;
+}
+.option-btn:hover{border-color:var(--primary)}
+.start-btn{
+  width:100%;height:50px;background:var(--accent);color:white;
+  border-radius:10px;font-size:18px;font-weight:700;
+  margin-top:8px;transition:all .2s;
+}
+.start-btn:hover{background:#E89A1A;box-shadow:0 4px 16px rgba(245,166,35,0.3)}
+.start-btn:disabled{background:var(--gray);cursor:not-allowed}
+
+/* ===== Quiz Page ===== */
+.quiz-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.quiz-progress{font-size:14px;color:var(--gray)}
+.quiz-progress .current{color:var(--primary);font-weight:700;font-size:18px}
+.quiz-timer{
+  background:var(--accent-light);color:var(--accent);
+  padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600;
+}
+.progress-bar{
+  width:100%;height:4px;background:var(--border);
+  border-radius:2px;margin-bottom:20px;overflow:hidden;
+}
+.progress-bar .fill{
+  height:100%;background:var(--primary);
+  border-radius:2px;transition:width .3s ease;
+}
+.question-card{
+  background:var(--white);border-radius:var(--radius);
+  padding:20px;box-shadow:var(--shadow);margin-bottom:16px;
+}
+.question-tag{
+  display:inline-block;font-size:11px;font-weight:600;
+  padding:2px 8px;border-radius:4px;margin-bottom:10px;
+}
+.question-tag.single{background:var(--primary-light);color:var(--primary)}
+.question-tag.multi{background:var(--accent-light);color:var(--accent)}
+.question-tag.judge{background:var(--success-bg);color:var(--success)}
+.question-text{
+  font-size:16px;line-height:1.6;color:var(--dark);
+  margin-bottom:16px;font-weight:500;
+}
+.options{display:flex;flex-direction:column;gap:8px}
+.option-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;border:1.5px solid var(--border);
+  border-radius:10px;transition:all .2s;cursor:pointer;
+}
+.option-item:hover{border-color:var(--primary)}
+.option-item.selected{
+  border-color:var(--primary);background:var(--primary-light);
+}
+.option-item.correct{
+  border-color:var(--success);background:var(--success-bg);
+}
+.option-item.wrong{
+  border-color:var(--error);background:var(--error-bg);
+}
+.option-item .opt-label{
+  width:28px;height:28px;border-radius:50%;
+  border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;color:var(--body);
+  transition:all .2s;flex-shrink:0;
+}
+.option-item.selected .opt-label{background:var(--primary);color:white;border-color:var(--primary)}
+.option-item.correct .opt-label{background:var(--success);color:white;border-color:var(--success)}
+.option-item.wrong .opt-label{background:var(--error);color:white;border-color:var(--error)}
+.option-item .opt-text{font-size:14px;color:var(--dark);flex:1}
+
+.quiz-nav{
+  display:flex;gap:10px;margin-top:20px;
+}
+.quiz-nav button{
+  flex:1;height:46px;border-radius:8px;
+  font-size:15px;font-weight:600;transition:all .2s;
+}
+.nav-prev{background:var(--white);border:1.5px solid var(--border);color:var(--body)}
+.nav-prev:hover{border-color:var(--primary);color:var(--primary)}
+.nav-next{background:var(--primary);color:white}
+.nav-next:hover{background:#1A5A9C}
+.nav-submit{background:var(--accent);color:white}
+.nav-submit:hover{background:#E89A1A}
+
+/* ===== Result Page ===== */
+.result-banner{
+  background:linear-gradient(135deg,var(--primary),#2196F3);
+  border-radius:var(--radius);padding:28px 20px;
+  text-align:center;color:white;margin-bottom:20px;
+}
+.result-banner .score{font-size:48px;font-weight:700;margin-bottom:4px}
+.result-banner .score-label{font-size:14px;opacity:.9}
+.result-stats{
+  display:flex;gap:12px;margin-bottom:20px;
+}
+.result-stat{
+  flex:1;background:var(--white);border-radius:var(--radius);
+  padding:14px;box-shadow:var(--shadow);text-align:center;
+}
+.result-stat .num{font-size:20px;font-weight:700}
+.result-stat .num.right{color:var(--success)}
+.result-stat .num.wrong{color:var(--error)}
+.result-stat .num.total{color:var(--primary)}
+.result-stat .label{font-size:11px;color:var(--gray);margin-top:4px}
+
+.review-section{margin-bottom:20px}
+.review-title{font-size:16px;font-weight:600;margin-bottom:12px}
+.review-item{
+  background:var(--white);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);margin-bottom:10px;
+}
+.review-item .review-q{font-size:14px;font-weight:500;margin-bottom:10px;color:var(--dark)}
+.review-item .review-a{
+  font-size:13px;padding:6px 10px;border-radius:6px;margin-bottom:4px;
+}
+.review-a.your-wrong{background:var(--error-bg);color:var(--error)}
+.review-a.correct{background:var(--success-bg);color:var(--success)}
+.review-a .label{font-weight:600;margin-right:6px}
+.review-explanation{
+  font-size:13px;color:var(--body);
+  padding:10px;background:var(--bg);border-radius:6px;margin-top:6px;
+}
+.result-actions{display:flex;gap:10px}
+.result-actions button{
+  flex:1;height:46px;border-radius:8px;font-size:15px;font-weight:600;
+}
+.btn-home{background:var(--white);border:1.5px solid var(--border);color:var(--body)}
+.btn-home:hover{border-color:var(--primary);color:var(--primary)}
+.btn-retry{background:var(--primary);color:white}
+.btn-retry:hover{background:#1A5A9C}
+
+/* ===== Admin Page ===== */
+.admin-table{width:100%;border-collapse:collapse;font-size:13px}
+.admin-table th{
+  background:var(--primary);color:white;
+  padding:10px 8px;text-align:left;font-weight:600;
+  font-size:12px;
+}
+.admin-table td{
+  padding:10px 8px;border-bottom:1px solid var(--border);
+  color:var(--body);
+}
+.admin-table tr:hover{background:var(--bg)}
+.admin-summary{
+  display:flex;gap:12px;margin-bottom:20px;
+}
+
+/* ===== Empty State ===== */
+.empty-state{
+  text-align:center;padding:40px 20px;color:var(--gray);
+}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state .text{font-size:14px}
+
+/* ===== Responsive ===== */
+@media(min-width:768px){
+  #app{box-shadow:0 0 40px rgba(0,0,0,0.06)}
+}
+@media(max-width:360px){
+  .subject-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://pnsqrgutwogjljyuiq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2vD5BRO11X7CDpJZT59IDQ_CcsPnQjS';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+<div id="app">
+
+<!-- ===== AUTH: LOGIN ===== -->
+<div class="page auth-page active" id="page-login">
+  <img class="auth-logo" src="xuejin_logo.jpg" alt="学锦教育" onerror="this.style.display='none'">
+  <div class="auth-title">学锦教育</div>
+  <div class="auth-subtitle">河北单招刷题平台</div>
+  <div class="auth-card">
+    <div class="auth-error" id="login-error"></div>
+    <div class="input-group">
+      <label>手机号</label>
+      <input type="tel" id="login-phone" placeholder="请输入手机号" maxlength="11" value="13800000001">
+    </div>
+    <div class="input-group">
+      <label>密码</label>
+      <input type="password" id="login-password" placeholder="请输入密码" maxlength="20" value="123456">
+    </div>
+    <button class="btn-primary" onclick="handleLogin()">登 录</button>
+    <div class="auth-switch">没有账号？<a href="javascript:void(0)" onclick="showPage('page-register')">去注册</a></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);text-align:center">
+      <a href="javascript:void(0)" onclick="showPage('page-admin-login')" style="font-size:13px;color:var(--gray);text-decoration:none">管理端登录</a>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:var(--gray);text-align:center;line-height:1.5">
+      首次使用已预置测试账号<br>手机号 13800000001 / 密码 123456
+    </div>
+  </div>
+</div>
+
+<!-- ===== AUTH: REGISTER ===== -->
+<div class="page auth-page" id="page-register">
+  <div style="position:absolute;top:16px;left:16px">
+    <button onclick="showPage('page-login')" style="font-size:14px;color:var(--gray);background:none">← 返回登录</button>
+  </div>
+  <img class="auth-logo" src="xuejin_logo.jpg" alt="学锦教育" onerror="this.style.display='none'">
+  <div class="auth-title">学锦教育</div>
+  <div class="auth-subtitle">河北单招刷题平台 · 新用户注册</div>
+  <div class="auth-card">
+    <div class="auth-error" id="register-error"></div>
+    <div class="input-group">
+      <label>姓名</label>
+      <input type="text" id="reg-name" placeholder="请输入真实姓名" maxlength="10">
+    </div>
+    <div class="input-group">
+      <label>手机号</label>
+      <input type="tel" id="reg-phone" placeholder="请输入手机号" maxlength="11">
+    </div>
+    <div class="input-group">
+      <label>密码</label>
+      <input type="password" id="reg-password" placeholder="设置密码（6-20位）" maxlength="20">
+    </div>
+    <div class="input-group">
+      <label>选择大类</label>
+      <select id="reg-category" style="width:100%;height:44px;padding:0 14px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;color:var(--dark);background:white">
+        <option value="">请选择报考大类</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="handleRegister()">注 册</button>
+    <div class="auth-switch">已有账号？<a href="javascript:void(0)" onclick="showPage('page-login')">去登录</a></div>
+  </div>
+</div>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div class="page auth-page" id="page-admin-login">
+  <div style="position:absolute;top:16px;left:16px">
+    <button onclick="showPage('page-login')" style="font-size:14px;color:var(--gray);background:none">← 返回学生端</button>
+  </div>
+  <img class="auth-logo" src="xuejin_logo.jpg" alt="学锦教育" style="border-radius:20px" onerror="this.style.display='none'">
+  <div class="auth-title">管理端登录</div>
+  <div class="auth-subtitle">学锦教育 · 教师管理后台</div>
+  <div class="auth-card">
+    <div class="auth-error" id="admin-error"></div>
+    <div class="input-group">
+      <label>管理员账号</label>
+      <input type="text" id="admin-account" placeholder="请输入管理员账号" value="xuejin">
+    </div>
+    <div class="input-group">
+      <label>密码</label>
+      <input type="password" id="admin-password" placeholder="请输入密码" value="xuejin2027">
+    </div>
+    <button class="btn-primary" onclick="handleAdminLogin()">管理端登录</button>
+    <div style="margin-top:12px;font-size:12px;color:var(--gray);text-align:center">默认账号: xuejin / 密码: xuejin2027</div>
+  </div>
+</div>
+
+<!-- ===== HOME ===== -->
+<div class="page" id="page-home">
+  <div class="app-header">
+    <div class="logo"><img src="xuejin_logo.jpg" alt="学锦教育">学锦教育</div>
+    <div class="user-info">
+      <span id="home-username"></span>
+      <button class="logout-btn" onclick="logout()">退出</button>
+    </div>
+  </div>
+  <div style="padding:16px">
+    <div class="home-banner">
+      <h2>河北单招刷题平台</h2>
+      <p>2027新考纲 · 全科覆盖 · 按类刷题</p>
+    </div>
+    <div class="home-stats">
+      <div class="stat-card">
+        <div class="num" id="home-total-q">0</div>
+        <div class="label">累计刷题</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="home-avg-score">0</div>
+        <div class="label">平均正确率</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="home-sessions">0</div>
+        <div class="label">刷题次数</div>
+      </div>
+    </div>
+    <div class="section-title">按科目刷题</div>
+    <div class="subject-grid" id="subject-grid"></div>
+  </div>
+</div>
+
+<!-- ===== SUBJECT CONFIG ===== -->
+<div class="page" id="page-config">
+  <div class="app-header">
+    <div class="logo"><img src="xuejin_logo.jpg" alt="学锦教育">学锦教育</div>
+    <div class="user-info"><span id="config-subject-name"></span></div>
+  </div>
+  <div style="padding:16px">
+    <button onclick="showPage('page-home')" style="font-size:14px;color:var(--gray);margin-bottom:16px;background:none">← 返回</button>
+    <h2 style="font-size:20px;margin-bottom:20px" id="config-title"></h2>
+    
+    <div class="config-section">
+      <div class="config-label">选择难度</div>
+      <div class="option-row" id="difficulty-options">
+        <button class="option-btn active" data-val="easy" onclick="selectOption(this,'difficulty')">简单</button>
+        <button class="option-btn" data-val="medium" onclick="selectOption(this,'difficulty')">中等</button>
+        <button class="option-btn" data-val="hard" onclick="selectOption(this,'difficulty')">困难</button>
+      </div>
+    </div>
+    
+    <div class="config-section">
+      <div class="config-label">选择题数</div>
+      <div class="option-row" id="count-options">
+        <button class="option-btn" data-val="100" onclick="selectOption(this,'count')">100题</button>
+        <button class="option-btn active" data-val="50" onclick="selectOption(this,'count')">50题</button>
+        <button class="option-btn" data-val="200" onclick="selectOption(this,'count')">200题</button>
+        <button class="option-btn" data-val="300" onclick="selectOption(this,'count')">300题</button>
+        <button class="option-btn" data-val="400" onclick="selectOption(this,'count')">400题</button>
+      </div>
+    </div>
+    
+    <button class="start-btn" onclick="startQuiz()">开始刷题</button>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="page" id="page-quiz">
+  <div class="app-header">
+    <div class="logo"><img src="xuejin_logo.jpg" alt="学锦教育">学锦教育</div>
+    <div class="user-info"><span id="quiz-subject-name"></span></div>
+  </div>
+  <div style="padding:16px">
+    <div class="quiz-header">
+      <div class="quiz-progress">第 <span class="current" id="quiz-current">1</span> / <span id="quiz-total">50</span> 题</div>
+      <div class="quiz-timer" id="quiz-timer">00:00</div>
+    </div>
+    <div class="progress-bar"><div class="fill" id="quiz-progress-fill" style="width:2%"></div></div>
+    
+    <div class="question-card" id="question-card"></div>
+    
+    <div class="quiz-nav" id="quiz-nav">
+      <button class="nav-prev" onclick="prevQuestion()">上一题</button>
+      <button class="nav-next" id="nav-next-btn" onclick="nextQuestion()">下一题</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div class="page" id="page-result">
+  <div class="app-header">
+    <div class="logo"><img src="xuejin_logo.jpg" alt="学锦教育">学锦教育</div>
+    <div class="user-info"><span id="result-subject"></span></div>
+  </div>
+  <div style="padding:16px">
+    <div class="result-banner">
+      <div class="score" id="result-score">0</div>
+      <div class="score-label">分</div>
+    </div>
+    <div class="result-stats">
+      <div class="result-stat">
+        <div class="num right" id="result-correct">0</div>
+        <div class="label">答对</div>
+      </div>
+      <div class="result-stat">
+        <div class="num wrong" id="result-wrong">0</div>
+        <div class="label">答错</div>
+      </div>
+      <div class="result-stat">
+        <div class="num total" id="result-total">0</div>
+        <div class="label">总题数</div>
+      </div>
+    </div>
+    <div class="result-stats">
+      <div class="result-stat">
+        <div class="num" id="result-accuracy" style="color:var(--accent)">0%</div>
+        <div class="label">正确率</div>
+      </div>
+      <div class="result-stat">
+        <div class="num" id="result-time" style="color:var(--gray)">0分</div>
+        <div class="label">用时</div>
+      </div>
+    </div>
+    <div class="review-section">
+      <div class="review-title">错题解析</div>
+      <div id="wrong-review"></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-home" onclick="showPage('page-home')">返回首页</button>
+      <button class="btn-retry" onclick="showPage('page-config')">再来一组</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN ===== -->
+<div class="page" id="page-admin">
+  <div class="app-header">
+    <div class="logo"><img src="xuejin_logo.jpg" alt="学锦教育">管理后台</div>
+    <div class="user-info">
+      <button class="logout-btn" onclick="adminLogout()">退出</button>
+    </div>
+  </div>
+  <div style="padding:16px">
+    <h2 style="font-size:20px;margin-bottom:16px">学生刷题数据汇总</h2>
+    <div class="admin-summary">
+      <div class="stat-card">
+        <div class="num" id="admin-student-count" style="color:var(--primary)">0</div>
+        <div class="label">注册学生</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="admin-total-questions" style="color:var(--accent)">0</div>
+        <div class="label">累计刷题量</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="admin-sessions" style="color:var(--success)">0</div>
+        <div class="label">刷题总次数</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="admin-table" id="admin-table">
+        <thead>
+          <tr>
+            <th>姓名</th>
+            <th>手机号</th>
+            <th>报考大类</th>
+            <th>刷题次数</th>
+            <th>累计题数</th>
+            <th>平均正确率</th>
+            <th>最近刷题</th>
+          </tr>
+        </thead>
+        <tbody id="admin-tbody"></tbody>
+      </table>
+    </div>
+    <div id="admin-empty" class="empty-state" style="display:none">
+      <div class="icon">📋</div>
+      <div class="text">暂无学生数据</div>
+    </div>
+    <h2 style="font-size:18px;margin:24px 0 12px">详细刷题记录</h2>
+    <div style="overflow-x:auto">
+      <table class="admin-table" id="admin-detail-table">
+        <thead>
+          <tr>
+            <th>姓名</th>
+            <th>科目</th>
+            <th>难度</th>
+            <th>题数</th>
+            <th>正确</th>
+            <th>正确率</th>
+            <th>用时</th>
+            <th>日期</th>
+          </tr>
+        </thead>
+        <tbody id="admin-detail-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ====== DATA: Categories ======
+const CATEGORIES = [
+  {id:'cat1',name:'一类',fullName:'一类 土木建筑',color:'#1E6DB5',subjects:['chinese','math','it','physics','geo']},
+  {id:'cat2',name:'二类',fullName:'二类 交通运输',color:'#F5A623',subjects:['chinese','math','english','physics','chem','geo']},
+  {id:'cat3',name:'三类',fullName:'三类 装备制造',color:'#4CAF50',subjects:['chinese','math','it','physics','politics']},
+  {id:'cat4',name:'四类',fullName:'四类 农牧轻纺',color:'#9C27B0',subjects:['chinese','math','english','chem','bio','politics']},
+  {id:'cat5',name:'五类',fullName:'五类 公共管理',color:'#00BCD4',subjects:['chinese','math','geo','history','politics']},
+  {id:'cat6',name:'六类',fullName:'六类 教育体育',color:'#FF9800',subjects:['chinese','math','english','history','politics','it']},
+  {id:'cat7',name:'七类',fullName:'七类 医药卫生',color:'#795548',subjects:['chinese','math','english','chem','bio']},
+  {id:'cat9',name:'九类',fullName:'九类 财经商贸',color:'#3F51B5',subjects:['chinese','math','politics','history','it']},
+  {id:'cat10',name:'十类',fullName:'十类 电子信息',color:'#E91E63',subjects:['chinese','math','english','physics','it']},
+];
+
+const SUBJECTS = {
+  chinese:{name:'语文',icon:'📖',desc:'150分 · 单选',score:150},
+  math:{name:'数学',icon:'🔢',desc:'150分 · 单选+判断',score:150},
+  english:{name:'英语',icon:'ABC',desc:'100分 · 单选',score:100},
+  it:{name:'信息技术',icon:'💻',desc:'100分 · 多题型',score:100},
+  history:{name:'历史',icon:'📜',desc:'100分 · 多题型',score:100},
+  politics:{name:'思想政治',icon:'⚖️',desc:'100分 · 多题型',score:100},
+  geo:{name:'地理',icon:'🌍',desc:'100分 · 多题型',score:100},
+  physics:{name:'物理',icon:'⚙️',desc:'职业适应性测试',score:350},
+  chem:{name:'化学',icon:'🧪',desc:'职业适应性测试',score:350},
+  bio:{name:'生物',icon:'🧬',desc:'职业适应性测试',score:350},
+};
+
+// ====== SAMPLE QUESTIONS (示例题，后续替换为真实题库) ======
+const SAMPLE_QUESTIONS = {
+  // 语文题库：简单30题 + 中等30题 + 困难30题 = 90题
+  chinese: {
+    easy: [
+      {type:'single',q:'下列词语中，加点字读音全部正确的一项是：',options:['A. 倔强(jué) 惩罚(chěng)','B. 氛围(fēn) 即使(jí)','C. 处理(chù) 卓越(zhuó)','D. 比较(jiào) 胆怯(què)'],answer:1,explanation:'A项"惩罚"应读chéng；C项"处理"应读chǔ；D项"胆怯"应读qiè。'},
+      {type:'single',q:'下列词语中，没有错别字的一项是：',options:['A. 迫不急待 走投无路','B. 一愁莫展 变本加利','C. 再接再厉 焕然一新','D. 谈笑风声 世外桃园'],answer:2,explanation:'A应为"迫不及待"；B应为"一筹莫展""变本加厉"；D应为"谈笑风生""世外桃源"。'},
+      {type:'single',q:'下列句子中，加点成语使用正确的一项是：',options:['A. 他做事虎头蛇尾，真是令人刮目相看','B. 这篇文章写得文不加点，一气呵成','C. 老师对他的批评简直是差强人意','D. 他上课总是目不转睛地走神'],answer:1,explanation:'"文不加点"形容文思敏捷，写文章不用涂改就很快写成，使用正确。'},
+      {type:'single',q:'下列各句中，没有语病的一项是：',options:['A. 通过这次活动，使我们增长了见识','B. 他的学习成绩有了很大的提高','C. 能否刻苦学习是取得好成绩的关键','D. 我们要认真克服并发现工作中的缺点'],answer:1,explanation:'A缺主语，去掉"通过"或"使"；C两面失衡，应改为"是能否取得"；D语序不当，应为"发现并克服"。'},
+      {type:'single',q:'下列句子中，标点符号使用正确的一项是：',options:['A. "好的，"他说："我马上就来。"','B. 我不知道他去哪里了？','C. 孔子说："三人行，必有我师焉。"','D. 花园里的花可多了，有牡丹、月季、芍药……等。'],answer:2,explanation:'A项"他说"后面的冒号应改为逗号；B项是陈述句，问号改句号；D项省略号和"等"不能同时用。'},
+      {type:'single',q:'"春风又绿江南岸"中，"绿"字的词性是：',options:['A. 名词','B. 形容词','C. 动词','D. 副词'],answer:2,explanation:'这里"绿"是使动用法，意思是"使……变绿"，是动词。'},
+      {type:'single',q:'下列句子中，使用了比喻修辞手法的一项是：',options:['A. 月亮一露面，满天的星星都惊散了','B. 飞流直下三千尺，疑是银河落九天','C. 白发三千丈，缘愁似个长','D. 两岸青山相对出，孤帆一片日边来'],answer:1,explanation:'将瀑布比作银河，是比喻。A是拟人，C是夸张，D是借代。'},
+      {type:'single',q:'下列作家与作品对应正确的一项是：',options:['A. 鲁迅——《骆驼祥子》','B. 老舍——《呐喊》','C. 茅盾——《子夜》','D. 巴金——《围城》'],answer:2,explanation:'《骆驼祥子》作者老舍，《呐喊》作者鲁迅，《围城》作者钱钟书。'},
+      {type:'single',q:'"四书"不包括下列哪一项？',options:['A. 《大学》','B. 《中庸》','C. 《论语》','D. 《诗经》'],answer:3,explanation:'四书是《大学》《中庸》《论语》《孟子》。《诗经》是五经之一。'},
+      {type:'single',q:'下列句子中，"之"字用作代词的一项是：',options:['A. 吾欲之南海','B. 学而时习之','C. 久之，目似瞑','D. 蚓无爪牙之利'],answer:1,explanation:'A项"之"是动词，到……去；C项是音节助词；D项是定语后置的标志。'},
+      {type:'single',q:'下列句子中，属于被动句的一项是：',options:['A. 青，取之于蓝','B. 而身死国灭，为天下笑','C. 求人可使报秦者','D. 句读之不知，惑之不解'],answer:1,explanation:'"为天下笑"即"被天下人嘲笑"，"为"表被动。'},
+      {type:'single',q:'下列关于《史记》的表述，错误的一项是：',options:['A. 是我国第一部纪传体通史','B. 作者是司马迁','C. 记载了从黄帝到汉武帝时期的历史','D. 全书分为本纪、世家、列传三部分'],answer:3,explanation:'《史记》包括本纪、世家、列传、表、书五部分。'},
+      {type:'single',q:'"床前明月光，疑是地上霜"出自哪位诗人之手？',options:['A. 杜甫','B. 李白','C. 白居易','D. 王维'],answer:1,explanation:'这是李白的《静夜思》。'},
+      {type:'single',q:'下列词语中，"兵"字解释为"兵器"的一项是：',options:['A. 兵不厌诈','B. 短兵相接','C. 兵强马壮','D. 兵临城下'],answer:1,explanation:'"短兵相接"的"兵"指兵器。A指兵法，C指士兵，D指军队。'},
+      {type:'single',q:'下列句子中，没有通假字的一项是：',options:['A. 学而时习之，不亦说乎','B. 便要还家，设酒杀鸡作食','C. 寒暑易节，始一反焉','D. 吾日三省吾身'],answer:3,explanation:'A项"说"通"悦"；B项"要"通"邀"；C项"反"通"返"。'},
+      {type:'single',q:'"醉翁之意不在酒"出自：',options:['A. 《岳阳楼记》','B. 《醉翁亭记》','C. 《滕王阁序》','D. 《陋室铭》'],answer:1,explanation:'出自欧阳修的《醉翁亭记》。'},
+      {type:'single',q:'下列句子中，"以"字表示"因为"的一项是：',options:['A. 以刀劈狼首','B. 不以物喜，不以己悲','C. 固国不以山溪之险','D. 以君之力，曾不能损魁父之丘'],answer:1,explanation:'A项"以"意为用；C项意为凭借；D项意为凭借、依靠。'},
+      {type:'single',q:'下列不属于唐宋八大家的是：',options:['A. 韩愈','B. 柳宗元','C. 欧阳修','D. 辛弃疾'],answer:3,explanation:'唐宋八大家：韩愈、柳宗元、欧阳修、苏洵、苏轼、苏辙、王安石、曾巩。辛弃疾是词人。'},
+      {type:'single',q:'下列句子中，属于判断句的一项是：',options:['A. 甚矣，汝之不惠','B. 南阳刘子骥，高尚士也','C. 何陋之有','D. 告之于帝'],answer:1,explanation:'"……，……也"是判断句的标志。A是倒装句，C是宾语前置，D是状语后置。'},
+      {type:'single',q:'"海内存知己，天涯若比邻"的作者是：',options:['A. 李白','B. 杜甫','C. 王勃','D. 王维'],answer:2,explanation:'出自王勃的《送杜少府之任蜀州》。'},
+      {type:'single',q:'下列词语中，感情色彩与其他三项不同的是：',options:['A. 处心积虑','B. 呕心沥血','C. 鞠躬尽瘁','D. 大公无私'],answer:0,explanation:'"处心积虑"是贬义词，其他都是褒义词。'},
+      {type:'single',q:'下列句子中，"乃"字解释为"才"的一项是：',options:['A. 乃不知有汉，无论魏晋','B. 太丘舍去，去后乃至','C. 乃重修岳阳楼','D. 当立者乃公子扶苏'],answer:1,explanation:'A项"乃"意为竟然；C项意为于是；D项意为是、就是。'},
+      {type:'single',q:'"但愿人长久，千里共婵娟"中的"婵娟"指的是：',options:['A. 美女','B. 月亮','C. 桂花','D. 宫殿'],answer:1,explanation:'婵娟在这里代指月亮。出自苏轼《水调歌头》。'},
+      {type:'single',q:'下列关于小说三要素的表述，正确的一项是：',options:['A. 人物、情节、环境','B. 时间、地点、人物','C. 起因、经过、结果','D. 开头、中间、结尾'],answer:0,explanation:'小说三要素是人物、情节、环境。'},
+      {type:'single',q:'"忽如一夜春风来，千树万树梨花开"运用的修辞手法是：',options:['A. 拟人','B. 比喻','C. 夸张','D. 排比'],answer:1,explanation:'将雪花比作梨花，是比喻。出自岑参《白雪歌送武判官归京》。'},
+      {type:'single',q:'下列作品中，不属于鲁迅的是：',options:['A. 《孔乙己》','B. 《阿Q正传》','C. 《茶馆》','D. 《狂人日记》'],answer:2,explanation:'《茶馆》是老舍的作品。'},
+      {type:'single',q:'"先天下之忧而忧，后天下之乐而乐"出自：',options:['A. 《醉翁亭记》','B. 《岳阳楼记》','C. 《小石潭记》','D. 《出师表》'],answer:1,explanation:'出自范仲淹的《岳阳楼记》。'},
+      {type:'single',q:'下列成语中，来源于寓言故事的是：',options:['A. 完璧归赵','B. 刻舟求剑','C. 卧薪尝胆','D. 三顾茅庐'],answer:1,explanation:'刻舟求剑是寓言故事，其他都是历史典故。'},
+      {type:'single',q:'"出师未捷身先死，长使英雄泪满襟"说的是：',options:['A. 曹操','B. 周瑜','C. 诸葛亮','D. 司马懿'],answer:2,explanation:'出自杜甫《蜀相》，写的是诸葛亮。'},
+      {type:'single',q:'"问君能有几多愁？恰似一江春水向东流"的作者是：',options:['A. 李煜','B. 李清照','C. 苏轼','D. 辛弃疾'],answer:0,explanation:'出自李煜《虞美人》。'},
+    ],
+    medium: [
+      {type:'single',q:'下列各组词语中，加点字读音全都不同的一组是：',options:['A. 俊俏/陡峭/疏浚','B. 玷污/沾染/字帖','C. 哺育/逮捕/果脯','D. 咽喉/哽咽/细嚼慢咽'],answer:3,explanation:'D项分别读yān/yè/yàn，全不同。A项都读qiào/qiào/jùn；B项diàn/zhān/tiè；C项bǔ/bǔ/fǔ。'},
+      {type:'single',q:'下列句子中，成语使用恰当的一项是：',options:['A. 这次选举，本来他是最有希望的，但由于他近来的所作所为不孚众望，结果落选了','B. 这些年轻的科学家决心以无所不为的勇气，克服重重困难，去探索大自然的奥秘','C. 齐白石画展在美术馆开幕了，国画研究院的画家竞相观摩，艺术爱好者趋之若鹜','D. 为了救活这家濒临倒闭的工厂，新上任的厂领导积极开展市场调查，狠抓产品质量和开发，真可谓处心积虑'],answer:0,explanation:'"不孚众望"意思是不能使众人信服，使用正确。"无所不为""趋之若鹜""处心积虑"都是贬义词，感情色彩不当。'},
+      {type:'single',q:'对下列句子所用修辞方法的判断，错误的一项是：',options:['A. 山舞银蛇，原驰蜡象——比喻、对偶','B. 他每一天每一点钟都要换一套衣服——夸张','C. 盼望着，盼望着，东风来了，春天的脚步近了——排比、拟人','D. 而且我这样大年纪的人，难道还不能料理自己么？——反问'],answer:2,explanation:'"盼望着，盼望着"是反复，不是排比。排比需要三个或以上结构相似的句子。'},
+      {type:'single',q:'下列关于文学常识的表述，错误的一项是：',options:['A. 李白，字太白，号青莲居士，人称"诗仙"','B. 杜甫，字子美，自号少陵野老，世称"诗圣"','C. 白居易，字乐天，号香山居士，是古文运动的倡导者','D. 王维，字摩诘，其诗画被称为"诗中有画，画中有诗"'],answer:2,explanation:'白居易是新乐府运动的倡导者，古文运动的倡导者是韩愈、柳宗元。'},
+      {type:'single',q:'下列对《论语》内容的理解，错误的一项是：',options:['A. "学而不思则罔，思而不学则殆"阐述了学与思的辩证关系','B. "三人行，必有我师焉"表现了孔子谦虚好学的态度','C. "温故而知新，可以为师矣"说明温习旧知识就能当老师','D. "知之者不如好之者，好之者不如乐之者"强调了兴趣的重要性'],answer:2,explanation:'"温故而知新"强调的是在温习旧知识中获得新的理解和体会，不只是"温习旧知识就能当老师"。'},
+      {type:'single',q:'"问君能有几多愁？恰似一江春水向东流"运用的修辞手法是：',options:['A. 借代 比喻','B. 比喻 夸张','C. 设问 比喻','D. 反问 排比'],answer:2,explanation:'自问自答是设问；把愁比作一江春水是比喻。出自李煜《虞美人》。'},
+      {type:'single',q:'下列句子中，没有词类活用的一项是：',options:['A. 春风又绿江南岸','B. 吾妻之美我者，私我也','C. 假舟楫者，非能水也','D. 予独爱莲之出淤泥而不染'],answer:3,explanation:'A项"绿"是使动用法；B项"美"是意动用法；C项"水"是名词作动词。'},
+      {type:'single',q:'下列有关《史记》的说法，错误的一项是：',options:['A. 《史记》是我国第一部纪传体通史，被鲁迅誉为"史家之绝唱，无韵之离骚"','B. 《史记》记载了上自黄帝下至汉武帝约三千年的历史','C. 全书共130篇，包括本纪12篇、世家30篇、列传70篇、表10篇、书8篇','D. "世家"主要记载历代帝王的兴衰和重大历史事件'],answer:3,explanation:'"本纪"记载帝王，"世家"记载诸侯和重要人物的事迹。'},
+      {type:'single',q:'"人生自古谁无死，留取丹心照汗青"中"汗青"指的是：',options:['A. 竹简','B. 史书','C. 竹子','D. 青色'],answer:1,explanation:'古代在竹简上记事，先以火烤使水分蒸发如汗，叫"汗青"，后借指史书。出自文天祥《过零丁洋》。'},
+      {type:'single',q:'"采菊东篱下，悠然见南山"体现了陶渊明的：',options:['A. 现实主义风格','B. 浪漫主义风格','C. 田园诗风格','D. 边塞诗风格'],answer:2,explanation:'陶渊明是田园诗派的开创者，这句诗体现了田园生活的闲适。'},
+      {type:'single',q:'《红楼梦》中"两弯似蹙非蹙罥烟眉，一双似喜非喜含情目"描写的是：',options:['A. 林黛玉','B. 薛宝钗','C. 王熙凤','D. 贾探春'],answer:0,explanation:'这是对林黛玉的经典肖像描写。'},
+      {type:'single',q:'"大江东去，浪淘尽，千古风流人物"出自：',options:['A. 辛弃疾《永遇乐·京口北固亭怀古》','B. 苏轼《念奴娇·赤壁怀古》','C. 陆游《示儿》','D. 岳飞《满江红》'],answer:1,explanation:'出自苏轼《念奴娇·赤壁怀古》，是豪放词的代表作。'},
+      {type:'single',q:'下列关于古代文体的表述，错误的一项是：',options:['A. 铭是古代刻在器物上用来警戒自己或称述功德的文字','B. 说是古代一种记叙文，以记叙事件为主要内容','C. 表是古代向帝王上书言事的一种文体','D. 记是古代一种散文体裁，可叙事、写景、状物'],answer:1,explanation:'"说"是议论文体，用以陈述作者对问题的观点，不是以记叙为主。'},
+      {type:'single',q:'下列各句中，表达得体的一句是：',options:['A. 我刚在姑姑家坐下来，她就有事失陪了，我只好无聊地翻翻闲书','B. 这么珍贵的书您都毫不犹豫地借给我，太感谢了，我会尽快璧还','C. 这种壁纸环保又美观，贴在您家里会让寒舍增色不少','D. 我们夫妇好不容易才得了这个千金，以后一定对她严格要求'],answer:1,explanation:'A项"失陪"是谦辞，只能说自己失陪；C项"寒舍"是谦辞，只能说自己家；D项"千金"是敬辞，称呼别人的女儿。'},
+      {type:'single',q:'下列诗句中，不是描写春天的一项是：',options:['A. 天街小雨润如酥，草色遥看近却无','B. 几处早莺争暖树，谁家新燕啄春泥','C. 接天莲叶无穷碧，映日荷花别样红','D. 乱花渐欲迷人眼，浅草才能没马蹄'],answer:2,explanation:'"接天莲叶无穷碧，映日荷花别样红"写的是夏日荷塘，出自杨万里《晓出净慈寺送林子方》。'},
+      {type:'single',q:'"老骥伏枥，志在千里；烈士暮年，壮心不已"的作者是：',options:['A. 曹操','B. 曹丕','C. 曹植','D. 诸葛亮'],answer:0,explanation:'出自曹操的《龟虽寿》。'},
+      {type:'single',q:'下列作家、作品、时代（国别）对应不正确的一项是：',options:['A. 普希金——《假如生活欺骗了你》——俄国','B. 安徒生——《皇帝的新装》——丹麦','C. 莫泊桑——《变色龙》——法国','D. 契诃夫——《装在套子里的人》——俄国'],answer:2,explanation:'《变色龙》是契诃夫的作品，不是莫泊桑的。'},
+      {type:'single',q:'下列成语全部出自《论语》的一组是：',options:['A. 温故知新 三人行必有我师 不耻下问','B. 舍生取义 生于忧患 愚公移山','C. 世外桃源 豁然开朗 无人问津','D. 一鼓作气 再衰三竭 辙乱旗靡'],answer:0,explanation:'B项出自《孟子》和《列子》；C项出自《桃花源记》；D项出自《曹刿论战》。'},
+      {type:'single',q:'下列各组句子中，加点词意义相同的一组是：',options:['A. ①故天将降大任于是人也 ②安能辨我是雄雌','B. ①肉食者鄙，未能远谋 ②先帝不以臣卑鄙','C. ①执策而临之 ②策之不以其道','D. ①入则无法家拂士 ②行拂乱其所为'],answer:1,explanation:'B项两个"鄙"都是"目光短浅"的意思。A项前"是"为"这"，后为判断动词；C项前"策"为"鞭子"，后为"鞭打"；D项前"拂"通"弼"辅佐，后为"违背"。'},
+      {type:'single',q:'"落红不是无情物，化作春泥更护花"的作者是：',options:['A. 陆游','B. 龚自珍','C. 辛弃疾','D. 李清照'],answer:1,explanation:'出自龚自珍《己亥杂诗》。'},
+      {type:'single',q:'下列句子中，"而"字表示转折关系的一项是：',options:['A. 积善成德，而神明自得','B. 人不知而不愠，不亦君子乎','C. 吾尝终日而思矣','D. 蟹六跪而二螯'],answer:1,explanation:'A项"而"表承接；C项表修饰；D项表并列。'},
+      {type:'single',q:'下列句子中，"其"字用作人称代词的一项是：',options:['A. 其真无马邪','B. 其真不知马也','C. 而不知太守之乐其乐也','D. 安陵君其许寡人'],answer:2,explanation:'"乐其乐"的第二个"其"是人称代词，他的。A是语气词，B是副词"大概"，D是语气词"一定"。'},
+      {type:'single',q:'"沉舟侧畔千帆过，病树前头万木春"出自：',options:['A. 李白','B. 杜甫','C. 刘禹锡','D. 白居易'],answer:2,explanation:'出自刘禹锡《酬乐天扬州初逢席上见赠》。'},
+      {type:'single',q:'下列不属于"五经"的是：',options:['A. 《诗经》','B. 《尚书》','C. 《论语》','D. 《春秋》'],answer:2,explanation:'五经：《诗》《书》《礼》《易》《春秋》。《论语》是四书之一。'},
+      {type:'single',q:'"会当凌绝顶，一览众山小"写的是哪座山？',options:['A. 华山','B. 泰山','C. 黄山','D. 嵩山'],answer:1,explanation:'出自杜甫《望岳》，写的是泰山。'},
+      {type:'single',q:'下列诗人中，属于边塞诗派的是：',options:['A. 王维','B. 岑参','C. 孟浩然','D. 陶渊明'],answer:1,explanation:'岑参是边塞诗派代表，王维、孟浩然是山水田园诗派，陶渊明是田园诗派。'},
+      {type:'single',q:'"满纸荒唐言，一把辛酸泪"出自：',options:['A. 《西游记》','B. 《水浒传》','C. 《红楼梦》','D. 《三国演义》'],answer:2,explanation:'这是《红楼梦》开篇的题诗。'},
+      {type:'single',q:'下列句子中，"道"字解释为"说"的一项是：',options:['A. 得道者多助','B. 不足为外人道也','C. 策之不以其道','D. 会天大雨，道不通'],answer:1,explanation:'A项"道"指道义；C项指方法；D项指道路。'},
+      {type:'single',q:'"山重水复疑无路，柳暗花明又一村"的作者是：',options:['A. 苏轼','B. 陆游','C. 辛弃疾','D. 王安石'],answer:1,explanation:'出自陆游《游山西村》。'},
+      {type:'single',q:'下列关于鲁迅作品的表述，错误的一项是：',options:['A. 《狂人日记》是中国现代文学史上第一篇白话小说','B. 《阿Q正传》是鲁迅小说的代表作','C. 《祝福》选自小说集《彷徨》','D. 《朝花夕拾》是鲁迅的杂文集'],answer:3,explanation:'《朝花夕拾》是散文集，不是杂文集。'},
+    ],
+    hard: [
+      {type:'single',q:'下列词语中，每对加点字的读音都相同的一组是：',options:['A. 勉强/强词夺理 纤夫/纤尘不染','B. 殷红/殷切 慰藉/声名狼藉','C. 翘楚/翘首以待 弹劾/言简意赅','D. 省亲/不省人事 星宿/三天两宿'],answer:0,explanation:'A项都读qiǎng/qiǎng，qiàn/qiàn。B项yān/yīn，jiè/jí；C项qiáo/qiáo，hé/gāi；D项xǐng/xǐng，xiù/xiǔ。'},
+      {type:'single',q:'下列对古诗词赏析不正确的一项是：',options:['A. "沉舟侧畔千帆过，病树前头万木春"以沉舟病树比喻自己，蕴含新事物取代旧事物的哲理','B. "山重水复疑无路，柳暗花明又一村"写出了路疑无而实有的境界，蕴含生活哲理','C. "落红不是无情物，化作春泥更护花"以落花自喻，表达了辞官后仍关心国家的情怀','D. "会挽雕弓如满月，西北望，射天狼"表达了苏轼想要建功立业的壮志，充满了悲观失望的情绪'],answer:3,explanation:'《江城子·密州出猎》表达的是渴望建功立业的豪情壮志，是豪放乐观的，不是悲观失望。'},
+      {type:'single',q:'下列对文言特殊句式分类正确的一项是：①廉颇者，赵之良将也 ②而君幸于赵王 ③何以知之 ④拜送书于庭 ⑤求人可使报秦者 ⑥臣诚恐见欺于王而负赵',options:['A. ①/②⑥/③/④/⑤','B. ①②/③/④/⑤/⑥','C. ①②⑥/③/④/⑤','D. ①/②/③④/⑤/⑥'],answer:0,explanation:'①判断句；②⑥被动句；③宾语前置；④状语后置；⑤定语后置。'},
+      {type:'single',q:'下列句子中，词类活用类型相同的一组是：',options:['A. ①假舟楫者，非能水也 ②吾妻之美我者，私我也','B. ①君子博学而日参省乎己 ②箕畚运于渤海之尾','C. ①春风又绿江南岸 ②能面刺寡人之过者','D. ①越国以鄙远，君知其难也 ②项伯杀人，臣活之'],answer:1,explanation:'B项两个都是名词作状语："日"是每天，"箕畚"是用箕畚。A项前为名词作动词，后为意动用法；C项前为使动用法，后为名词作状语；D项前为意动用法，后为使动用法。'},
+      {type:'single',q:'下列关于我国古代文化知识的表述，错误的一项是：',options:['A. "五岳"指东岳泰山、西岳华山、中岳嵩山、北岳恒山、南岳衡山','B. "四时"指春夏秋冬四季','C. 古代的"江河"专指长江和黄河','D. 古人称谓"字"是出生后不久由父亲起的，"名"是成年后才取的'],answer:3,explanation:'古人的"名"是出生后由父亲取的，"字"是成年后取的。D项说反了。'},
+      {type:'single',q:'下列关于元曲的表述，错误的一项是：',options:['A. 元曲包括散曲和杂剧，散曲又分为小令和套数','B. 元曲四大家指关汉卿、马致远、郑光祖、白朴','C. 《窦娥冤》是关汉卿的代表作','D. 元杂剧每本戏可以有多本，每本不限折数'],answer:3,explanation:'元杂剧每本戏一般只有一本，每本四折（或加楔子），不是不限折数。'},
+      {type:'single',q:'下列诗句中，没有使用借代手法的一项是：',options:['A. 想当年，金戈铁马，气吞万里如虎','B. 主人下马客在船，举酒欲饮无管弦','C. 两岸青山相对出，孤帆一片日边来','D. 忽如一夜春风来，千树万树梨花开'],answer:3,explanation:'D项是比喻，将雪花比作梨花。A项"金戈铁马"代指军队；B项"管弦"代指音乐；C项"孤帆"代指船。'},
+      {type:'single',q:'下列成语所对应的历史人物，错误的一项是：',options:['A. 卧薪尝胆——勾践','B. 三顾茅庐——刘备 诸葛亮','C. 破釜沉舟——项羽','D. 指鹿为马——曹操'],answer:3,explanation:'"指鹿为马"对应的是赵高，不是曹操。'},
+      {type:'single',q:'下列关于中国古代科举制度的表述，错误的一项是：',options:['A. 科举制度始于隋朝，完善于唐朝，废除于清朝末年','B. 进士是科举考试的最高功名，考中进士又称"及第"','C. 科举考试分为院试、乡试、会试、殿试四级','D. 会试考中的称"举人"，第一名称"解元"'],answer:3,explanation:'乡试考中的称"举人"，第一名称"解元"；会试考中的称"贡士"，第一名称"会元"。'},
+      {type:'single',q:'下列句子中，加点词语古今意义相同的一项是：',options:['A. 行李之往来，共其乏困','B. 沛公居山东时，贪于财货','C. 于是秦人拱手而取西河之外','D. 君子博学而日参省乎己'],answer:2,explanation:'A项"行李"古义指出使的人；B项"山东"古义指崤山以东；D项"博学"古义指广泛地学习。C项"取"古今都是"夺取"的意思。'},
+      {type:'single',q:'下列对"乃"字的用法分类正确的一项是：①乃不知有汉 ②乃重修岳阳楼 ③当立者乃公子扶苏 ④度我至军中，公乃入',options:['A. ①/②/③/④','B. ①②/③/④','C. ①/②③/④','D. ①④/②/③'],answer:0,explanation:'①"乃"意为"竟然"；②意为"于是，就"；③意为"是，就是"（表判断）；④意为"才"。四个意义都不同。'},
+      {type:'single',q:'下列对古诗词意象的理解，错误的一项是：',options:['A. "月亮"常用来寄托思乡之情','B. "菊花"象征高洁隐逸','C. "梅花"象征坚贞不屈','D. "杨柳"象征坚韧不拔'],answer:3,explanation:'"杨柳"在古诗词中多象征离别（"柳"与"留"谐音），不是"坚韧不拔"。'},
+      {type:'single',q:'下列关于文化常识的表述，错误的一项是：',options:['A. "总角"指古代未成年的人把头发扎成髻，借指童年时期','B. "豆蔻年华"指女子十五岁，"及笄"指女子十三四岁','C. "弱冠"指男子二十岁，古代男子二十岁行冠礼','D. "期颐"指一百岁，"耄耋"指八九十岁'],answer:1,explanation:'"豆蔻年华"指女子十三四岁，"及笄"指女子十五岁。B项说反了。'},
+      {type:'single',q:'下列各组句子中，"于"字的意义和用法相同的一组是：',options:['A. ①月出于东山之上 ②此非孟德之困于周郎者乎','B. ①冰，水为之，而寒于水 ②师不必贤于弟子','C. ①苏子与客泛舟游于赤壁之下 ②不拘于时，学于余','D. ①于其身也，则耻师焉 ②青，取之于蓝，而青于蓝'],answer:1,explanation:'B项两个"于"都是介词"比"，表示比较。A项前为"从"，后为"被"；C项前为"在"，后为"向"；D项前为"对于"，后为"从/比"。'},
+      {type:'single',q:'下列对《出师表》一文的理解，错误的一项是：',options:['A. "表"是古代向帝王上书言事的一种文体','B. 文中诸葛亮回顾了随先帝创业的艰难经历','C. "先帝不以臣卑鄙"中"卑鄙"是指身份低微、见识短浅','D. 全文表达了诸葛亮想要取而代之的野心'],answer:3,explanation:'《出师表》表达了诸葛亮的忠诚和北伐决心，没有"取而代之的野心"。'},
+      {type:'single',q:'下列关于"辞"的用法，分类正确的一项是：①辞曰："臣之壮也，犹不如人" ②辞楼下殿，辇来于秦 ③其文约，其辞微 ④今者出，未辞也，为之奈何',options:['A. ①②/③/④','B. ①/②/③/④','C. ①④/②/③','D. ①/②③/④'],answer:2,explanation:'①④都是"告辞、辞别"的意思；②是"离开"；③是"言辞、文辞"。'},
+      {type:'single',q:'下列关于现代文阅读的表述，错误的一项是：',options:['A. 概括文章主要内容，可以从题目、关键句、段意综合等方面入手','B. 分析人物形象，主要从外貌、语言、动作、心理、神态等描写入手','C. 说明文的说明顺序只有时间顺序和空间顺序两种','D. 议论文的三要素是论点、论据、论证'],answer:2,explanation:'说明文的说明顺序有时间顺序、空间顺序、逻辑顺序三种，不只是两种。'},
+      {type:'single',q:'下列对《荷塘月色》的分析，不正确的一项是：',options:['A. "曲曲折折的荷塘上面，弥望的是田田的叶子"用叠词增强了音韵美','B. "微风过处，送来缕缕清香，仿佛远处高楼上渺茫的歌声似的"运用了通感','C. "叶子本是肩并肩密密地挨着"运用了比喻的修辞手法','D. "月光如流水一般，静静地泻在这一片叶子和花上"中"泻"字化静为动'],answer:2,explanation:'"叶子本是肩并肩密密地挨着"运用的是拟人的修辞手法，不是比喻。'},
+      {type:'single',q:'下列各句中，没有语病、句意明确的一句是：',options:['A. 政府应进一步加大改革力度，整合并均衡教育资源，真正让每个孩子都能接受平等的教育、优质的教育','B. 根据气象资料分析，长江中下游近期基本无降雨过程，仅江苏和浙江的部分地区可能有短时小到中雨','C. 初始阶段，由于对滩海地区的地质条件整体认识存在误区，导致了勘探队多次与遇到的油层擦肩而过','D. 树立和落实科学发展观，发展和重视农业产后经济，应当成为解决我国"三农"问题的重要组成部分'],answer:0,explanation:'B项"江苏和浙江的部分地区"有歧义；C项"由于"开头导致缺主语；D项语序不当，应为"重视和发展"。'},
+      {type:'single',q:'下列对文言文句子的翻译，正确的一项是：',options:['A. 何陋之有？——什么是简陋的？','B. 蚓无爪牙之利，筋骨之强。——蚯蚓没有爪牙的锋利，筋骨的坚强','C. 求人可使报秦者。——寻找可以出使秦国回复的人','D. 青，取之于蓝，而青于蓝。——青，从蓝草中取得，而且比蓝草更青'],answer:3,explanation:'A项应为"有什么简陋的呢"（宾语前置）；B项应为"蚯蚓没有锋利的爪牙，坚强的筋骨"（定语后置）；C项应为"寻找可以出使回复秦国的人"（定语后置）。'},
+      {type:'single',q:'下列对《红楼梦》的表述，错误的一项是：',options:['A. 《红楼梦》又名《石头记》，作者是清代作家曹雪芹','B. 小说以贾史王薛四大家族的兴衰为背景','C. "金陵十二钗"指林黛玉、薛宝钗、王熙凤等十二位女性','D. "粉面含春威不露，丹唇未启笑先闻"描写的是林黛玉'],answer:3,explanation:'"粉面含春威不露，丹唇未启笑先闻"描写的是王熙凤，不是林黛玉。'},
+      {type:'single',q:'下列各句中，加点的成语使用正确的一项是：',options:['A. 从人们早就耳熟能详的传统曲目，到让人耳目一新的现代佳作，老艺术家们表演得游刃有余','B. 看到果农家里汗牛充栋的黄灿灿的橙子，我深感欣慰','C. 老师们的音容笑貌还历历在目，同学们相聚的场景还记忆犹新','D. 他最近状态不佳，接连几次考试都不理想，屡试不爽，心情糟透了'],answer:0,explanation:'B项"汗牛充栋"形容书多，不能形容橙子；C项"记忆犹新"的"犹"就是"还"，与前面"还"重复；D项"屡试不爽"指屡次试验都没有差错，不是"考试没考好"。'},
+      {type:'single',q:'下列关于"说"这种文体的表述，正确的一项是：',options:['A. "说"是一种议论文体，用以陈述作者对某些问题的观点','B. "说"就是说说的意思，相当于今天的说明文','C. "说"是一种叙事文体，以记叙为主','D. "说"是古代的一种奏章，用于向君主进言'],answer:0,explanation:'"说"是古代的一种议论文体，既可说明记叙事物，也可发表议论，但都是为了陈述作者的见解。'},
+      {type:'single',q:'下列句子中，"以"字的意义和用法分类正确的一组是：①以勇气闻于诸侯 ②愿以十五城请易璧 ③以相如功大，拜为上卿 ④严大国之威以修敬也',options:['A. ①/②/③/④','B. ①②/③/④','C. ①/②③/④','D. ①③/②/④'],answer:0,explanation:'①"以"意为"凭借"；②意为"用、拿"；③意为"因为"；④意为"来、用来"（表目的）。四个意义都不同。'},
+      {type:'single',q:'下列关于中国古代地理的表述，错误的一项是：',options:['A. "山东"在古代常指崤山以东地区','B. "河内"指黄河以北的地区','C. "江表"指长江以北的地区','D. "关中"指函谷关以西的地区'],answer:2,explanation:'"江表"指长江以南的地区，不是以北。'},
+      {type:'single',q:'下列各组句子中，加点词的意义和用法相同的一组是：',options:['A. ①王好战，请以战喻 ②以五十步笑百步，则何如','B. ①今者有小人之言，令将军与臣有郤 ②欲勿与，即患秦兵之来','C. ①其皆出于此乎 ②其可怪也欤','D. ①青，取之于蓝，而青于蓝 ②君子博学而日参省乎己'],answer:0,explanation:'A项两个"以"都是介词，"用/凭借"的意思。B项前"之"是"的"，后"之"是取消句子独立性；C项前"其"表推测"大概"，后表反问"难道"；D项前"而"表转折，后表递进。'},
+      {type:'single',q:'下列对"之"的用法分类正确的一项是：①何陋之有 ②渔人甚异之 ③予独爱莲之出淤泥而不染 ④送杜少府之任蜀州 ⑤学而时习之',options:['A. ①/②⑤/③/④','B. ①②/③/④/⑤','C. ①/②③/④⑤','D. ①③/②/④/⑤'],answer:0,explanation:'①宾语前置的标志；②⑤代词；③取消句子独立性；④动词"到"。'},
+      {type:'single',q:'"连中三元"中的"三元"指的是：',options:['A. 秀才、举人、进士','B. 解元、会元、状元','C. 探花、榜眼、状元','D. 乡试、会试、殿试'],answer:1,explanation:'"连中三元"指在乡试、会试、殿试中都考第一名，即解元、会元、状元。'},
+      {type:'single',q:'下列各句中，标点符号使用完全正确的一项是：',options:['A. 他到处收集资料，对收集到的资料进行认真分析，最后才得出结论，他这种认真负责的态度是值得我们学习的','B. 这个经济协作区，具有大量的科技信息，较强的工业基础，巨大的生活资料、生产资料市场，较丰富的动植物、矿产、海洋、旅游等资源','C. 他为什么要说这些话？是有意的，还是无意的？还是……？大家都不知道','D. 今天去呢？还是明天去呢？我实在拿不定主意'],answer:1,explanation:'A项"结论"后应改为句号或冒号；C项"还是……？"省略号和问号不能同时用；D项选择问句只在最后用问号，第一个问号改逗号。'},
+      {type:'single',q:'下列关于古代称谓的表述，错误的一项是：',options:['A. "陛下"是对帝王的尊称，"殿下"是对太子、亲王的尊称','B. "足下"是对对方的尊称，"在下"是对自己的谦称','C. "令尊"是对对方父亲的尊称，"家严"是对自己父亲的谦称','D. "卿"是古代君对臣的称呼，臣不能称君为"卿"'],answer:3,explanation:'"卿"也可以是君对臣的爱称、朋友之间的称呼，不是只能君称臣。'},
+    ]
+  },
+  // 数学题库：简单30题 + 中等30题 + 困难30题 = 90题
+  math: {
+    easy: [
+      {type:'single',q:'集合 A = {1, 2, 3}，B = {2, 3, 4}，则 A ∩ B =',options:['A. {1, 2, 3, 4}','B. {2, 3}','C. {1, 4}','D. ∅'],answer:1,explanation:'交集是两个集合共有的元素，A和B的公共元素是2、3。'},
+      {type:'single',q:'函数 f(x) = 2x + 1，则 f(3) =',options:['A. 5','B. 6','C. 7','D. 8'],answer:2,explanation:'f(3) = 2×3 + 1 = 7。'},
+      {type:'single',q:'不等式 x - 1 > 0 的解集是：',options:['A. x > 1','B. x < 1','C. x > -1','D. x < -1'],answer:0,explanation:'x - 1 > 0，移项得 x > 1。'},
+      {type:'single',q:'sin 30° =',options:['A. 1/2','B. √2/2','C. √3/2','D. 1'],answer:0,explanation:'sin 30° = 1/2 是特殊角三角函数值，需要熟记。'},
+      {type:'judge',q:'空集是任何集合的子集。',options:['正确','错误'],answer:0,explanation:'空集是任何集合的子集，这是集合论中的基本性质。'},
+      {type:'single',q:'函数 y = √(x - 2) 的定义域是：',options:['A. x > 2','B. x ≥ 2','C. x < 2','D. x ≤ 2'],answer:1,explanation:'根号内的值必须非负，即 x - 2 ≥ 0，所以 x ≥ 2。'},
+      {type:'single',q:'等差数列 {aₙ} 中，a₁ = 2，d = 3，则 a₅ =',options:['A. 11','B. 14','C. 17','D. 20'],answer:1,explanation:'a₅ = a₁ + 4d = 2 + 4×3 = 14。'},
+      {type:'single',q:'已知向量 a = (1, 2)，b = (3, 1)，则 a·b =',options:['A. 3','B. 5','C. 6','D. 7'],answer:1,explanation:'a·b = 1×3 + 2×1 = 5。'},
+      {type:'single',q:'cos 60° =',options:['A. 1/2','B. √2/2','C. √3/2','D. 1'],answer:0,explanation:'cos 60° = 1/2。'},
+      {type:'single',q:'不等式 2x - 4 ≤ 0 的解集是：',options:['A. x ≤ 2','B. x ≥ 2','C. x ≤ -2','D. x ≥ -2'],answer:0,explanation:'2x - 4 ≤ 0 → 2x ≤ 4 → x ≤ 2。'},
+      {type:'judge',q:'函数 f(x) = x² 在 R 上是增函数。',options:['正确','错误'],answer:1,explanation:'f(x) = x² 在 (-∞, 0) 上递减，在 (0, +∞) 上递增，不是在 R 上的增函数。'},
+      {type:'single',q:'复数 z = 3 + 4i 的模 |z| =',options:['A. 3','B. 4','C. 5','D. 7'],answer:2,explanation:'|z| = √(3² + 4²) = √25 = 5。'},
+      {type:'single',q:'等比数列 {aₙ} 中，a₁ = 2，q = 3，则 a₃ =',options:['A. 6','B. 12','C. 18','D. 54'],answer:2,explanation:'a₃ = a₁·q² = 2×9 = 18。'},
+      {type:'single',q:'下列函数中，是偶函数的是：',options:['A. y = x','B. y = x²','C. y = x³','D. y = 1/x'],answer:1,explanation:'f(x) = x²，f(-x) = (-x)² = x² = f(x)，满足偶函数定义。'},
+      {type:'single',q:'log₂ 8 =',options:['A. 2','B. 3','C. 4','D. 8'],answer:1,explanation:'2³ = 8，所以 log₂ 8 = 3。'},
+      {type:'judge',q:'两个互为子集的集合一定相等。',options:['正确','错误'],answer:1,explanation:'A⊆B 且 B⊆A 时 A=B，但如果只有 A⊆B，不一定相等。例如空集是任何集合的子集，但不等于任何非空集合。'},
+      {type:'single',q:'函数 y = 1/x 的定义域是：',options:['A. R','B. {x | x ≠ 0}','C. {x | x > 0}','D. {x | x ≥ 0}'],answer:1,explanation:'分母不能为0，所以 x ≠ 0。'},
+      {type:'single',q:'在等差数列 {aₙ} 中，a₁ = 1，a₃ = 7，则公差 d =',options:['A. 2','B. 3','C. 4','D. 6'],answer:1,explanation:'a₃ = a₁ + 2d，7 = 1 + 2d，d = 3。'},
+      {type:'single',q:'tan 45° =',options:['A. 0','B. 1','C. √3','D. 不存在'],answer:1,explanation:'tan 45° = 1。'},
+      {type:'single',q:'一元二次方程 x² - 5x + 6 = 0 的两个根是：',options:['A. 1和6','B. 2和3','C. -2和-3','D. 1和5'],answer:1,explanation:'因式分解：(x-2)(x-3) = 0，所以 x = 2 或 x = 3。'},
+      {type:'single',q:'集合 A = {1, 2, 3}，B = {2, 3, 4}，则 A ∪ B =',options:['A. {1, 2, 3, 4}','B. {2, 3}','C. {1, 4}','D. ∅'],answer:0,explanation:'并集是两个集合所有元素组成的集合（不重复）。'},
+      {type:'judge',q:'对数函数 y = log_a x（a > 0 且 a ≠ 1）的定义域是 (0, +∞)。',options:['正确','错误'],answer:0,explanation:'对数函数的真数必须大于0，所以定义域是 (0, +∞)。'},
+      {type:'single',q:'向量 a = (2, 3)，b = (-1, 2)，则 a + b =',options:['A. (1, 5)','B. (3, 5)','C. (1, 1)','D. (3, 1)'],answer:0,explanation:'向量加法，对应坐标相加：(2+(-1), 3+2) = (1, 5)。'},
+      {type:'single',q:'下列函数中，在 (0, +∞) 上单调递增的是：',options:['A. y = -x','B. y = 1/x','C. y = x²','D. y = -x²'],answer:2,explanation:'y = x² 在 (0, +∞) 上单调递增。'},
+      {type:'single',q:'幂函数 y = x^α 过点 (2, 8)，则 α =',options:['A. 2','B. 3','C. 4','D. 5'],answer:1,explanation:'代入得 8 = 2^α，α = 3。'},
+      {type:'single',q:'在三角形ABC中，a = 2，b = 3，C = 60°，则 c =',options:['A. √7','B. √13','C. √19','D. 7'],answer:0,explanation:'由余弦定理 c² = a² + b² - 2ab·cos C = 4 + 9 - 2×2×3×(1/2) = 7，c = √7。'},
+      {type:'single',q:'若命题 p：2 + 3 = 5，命题 q：4 是偶数，则',options:['A. p 真，q 假','B. p 假，q 真','C. p 真，q 真','D. p 假，q 假'],answer:2,explanation:'2 + 3 = 5 是真命题，4 是偶数也是真命题。'},
+      {type:'judge',q:'零向量与任意向量平行。',options:['正确','错误'],answer:0,explanation:'这是规定：零向量与任意向量平行。'},
+      {type:'single',q:'函数 f(x) = x² - 2x + 1 的最小值是：',options:['A. -1','B. 0','C. 1','D. 2'],answer:1,explanation:'f(x) = (x-1)² ≥ 0，当 x = 1 时取最小值 0。'},
+      {type:'single',q:'从5名同学中选出2名参加比赛，不同的选法有多少种？',options:['A. 5种','B. 10种','C. 20种','D. 25种'],answer:1,explanation:'这是组合问题：C(5,2) = 5×4/(2×1) = 10 种。'},
+    ],
+    medium: [
+      {type:'single',q:'已知函数 f(x) = ax³ + bx + 1，若 f(2) = 3，则 f(-2) =',options:['A. -3','B. -1','C. 0','D. 1'],answer:1,explanation:'令 g(x) = ax³ + bx，则 g(x) 是奇函数，g(-2) = -g(2)。f(2) = g(2) + 1 = 3，g(2) = 2，g(-2) = -2，f(-2) = g(-2) + 1 = -1。'},
+      {type:'single',q:'设 a = log₂ 3，b = log₄ 3，c = log₈ 3，则 a, b, c 的大小关系是：',options:['A. a > b > c','B. a > c > b','C. b > a > c','D. c > a > b'],answer:0,explanation:'换底公式：b = (1/2)log₂3，c = (1/3)log₂3。所以 a > b > c。'},
+      {type:'single',q:'在△ABC中，a = √3，b = 1，B = 30°，则 A =',options:['A. 60°','B. 120°','C. 60° 或 120°','D. 30° 或 150°'],answer:2,explanation:'由正弦定理：a/sin A = b/sin B，√3/sin A = 1/sin 30° = 2，sin A = √3/2，A = 60° 或 120°。两个都满足条件。'},
+      {type:'single',q:'函数 y = 2sin(2x + π/3) 的最小正周期是：',options:['A. π/2','B. π','C. 2π','D. 4π'],answer:1,explanation:'周期 T = 2π/ω = 2π/2 = π。'},
+      {type:'single',q:'已知数列 {aₙ} 满足 a₁ = 1，aₙ₊₁ = aₙ + 2n + 1，则 a₄ =',options:['A. 13','B. 15','C. 16','D. 20'],answer:2,explanation:'a₂ = a₁ + 3 = 4，a₃ = a₂ + 5 = 9，a₄ = a₃ + 7 = 16。'},
+      {type:'judge',q:'若 a > b > 0，则 a² > b²。',options:['正确','错误'],answer:0,explanation:'因为 a > b > 0，所以 a² - b² = (a-b)(a+b) > 0，所以 a² > b²。'},
+      {type:'single',q:'复数 z₁ = 2 + i，z₂ = 1 - i，则 z₁·z₂ =',options:['A. 1 + 3i','B. 3 + i','C. 3 - i','D. 1 - 3i'],answer:2,explanation:'z₁·z₂ = (2+i)(1-i) = 2 - 2i + i - i² = 2 - i + 1 = 3 - i。'},
+      {type:'single',q:'已知向量 |a| = 3，|b| = 4，夹角为 60°，则 |a + b| =',options:['A. √13','B. √19','C. √37','D. 5'],answer:2,explanation:'|a+b|² = |a|² + 2a·b + |b|² = 9 + 2×3×4×cos60° + 16 = 9 + 12 + 16 = 37，|a+b| = √37。'},
+      {type:'single',q:'函数 f(x) = x³ - 3x 在 x = 1 处的导数值为：',options:['A. -1','B. 0','C. 1','D. 3'],answer:1,explanation:"f'(x) = 3x² - 3，f'(1) = 3 - 3 = 0。"},
+      {type:'single',q:'等比数列 {aₙ} 的前 n 项和为 Sₙ，若 a₁ = 1，q = 2，则 S₄ =',options:['A. 7','B. 8','C. 15','D. 16'],answer:2,explanation:'S₄ = a₁(1-q⁴)/(1-q) = 1×(1-16)/(1-2) = 15。'},
+      {type:'single',q:'若 0 < a < 1，则函数 y = log_a (x - 1) 的定义域是：',options:['A. (0, +∞)','B. (1, +∞)','C. [1, +∞)','D. (-∞, 1)'],answer:1,explanation:'对数函数真数大于0，即 x - 1 > 0，x > 1。'},
+      {type:'judge',q:'函数 y = sin x 在 [0, π/2] 上单调递增。',options:['正确','错误'],answer:0,explanation:'sin x 在 [-π/2, π/2] 上单调递增，[0, π/2] 是其子区间。'},
+      {type:'single',q:'从4本不同的书中选出3本，分给3个同学，每人1本，不同的分法有多少种？',options:['A. 4种','B. 12种','C. 24种','D. 64种'],answer:2,explanation:'这是排列问题：A(4,3) = 4×3×2 = 24 种。'},
+      {type:'single',q:'已知 sin α = 3/5，α ∈ (π/2, π)，则 cos α =',options:['A. 4/5','B. -4/5','C. 3/4','D. -3/4'],answer:1,explanation:'α在第二象限，cos为负。cos α = -√(1 - 9/25) = -√(16/25) = -4/5。'},
+      {type:'single',q:'不等式 x² - 3x - 4 < 0 的解集是：',options:['A. (-1, 4)','B. (-∞, -1) ∪ (4, +∞)','C. (-4, 1)','D. (-∞, -4) ∪ (1, +∞)'],answer:0,explanation:'x² - 3x - 4 = (x-4)(x+1) < 0，因为开口向上，所以解集是 (-1, 4)。'},
+      {type:'single',q:'在等差数列 {aₙ} 中，S₁₀ = 100，S₂₀ = 400，则 S₃₀ =',options:['A. 600','B. 700','C. 800','D. 900'],answer:3,explanation:'等差数列中，S₁₀, S₂₀-S₁₀, S₃₀-S₂₀ 也成等差数列。即 100, 300, 500，所以 S₃₀ = 900。'},
+      {type:'single',q:'函数 y = eˣ 的导数是：',options:['A. eˣ','B. xeˣ⁻¹','C. eˣ / x','D. ln x'],answer:0,explanation:'指数函数 eˣ 的导数就是它本身。'},
+      {type:'single',q:'若 |a| = 5，|b| = 3，a·b = 7.5，则 a 与 b 的夹角是：',options:['A. 30°','B. 45°','C. 60°','D. 90°'],answer:2,explanation:'cos θ = a·b/(|a||b|) = 7.5/15 = 0.5，θ = 60°。'},
+      {type:'judge',q:'"x > 1"是"x² > 1"的充分不必要条件。',options:['正确','错误'],answer:0,explanation:'x > 1 ⇒ x² > 1，充分；但 x² > 1 不一定 x > 1（可以 x < -1），不必要。'},
+      {type:'single',q:'已知 f(x) = x² + 2x - 3，则 f(x) 的单调递减区间是：',options:['A. (-∞, -1]','B. [-1, +∞)','C. (-∞, -3]','D. [-3, 1]'],answer:0,explanation:'f(x) = (x+1)² - 4，开口向上，对称轴 x = -1，递减区间为 (-∞, -1]。'},
+      {type:'single',q:'某射手射击一次，命中的概率是0.7，连续射击3次，恰好命中2次的概率是：',options:['A. 0.147','B. 0.343','C. 0.441','D. 0.637'],answer:2,explanation:'P = C(3,2) × 0.7² × 0.3 = 3 × 0.49 × 0.3 = 0.441。'},
+      {type:'single',q:'若 x > 0，则 x + 1/x 的最小值是：',options:['A. 1','B. 2','C. 3','D. 4'],answer:1,explanation:'由基本不等式，x + 1/x ≥ 2√(x·1/x) = 2，当 x = 1 时取等号。'},
+      {type:'single',q:'函数 y = ln x 的导数是：',options:['A. 1/x','B. x','C. ln x','D. eˣ'],answer:0,explanation:"(ln x)' = 1/x。"},
+      {type:'single',q:'已知圆锥的底面半径为3，高为4，则圆锥的侧面积为：',options:['A. 12π','B. 15π','C. 20π','D. 30π'],answer:1,explanation:'母线长 l = √(3² + 4²) = 5，侧面积 S = πrl = π×3×5 = 15π。'},
+      {type:'judge',q:'向量 a = (1, 2) 与 b = (-2, 1) 垂直。',options:['正确','错误'],answer:0,explanation:'a·b = 1×(-2) + 2×1 = -2 + 2 = 0，所以两向量垂直。'},
+      {type:'single',q:'集合 A = {x | x² - 3x + 2 = 0}，B = {x | x² - 2x = 0}，则 A ∩ B =',options:['A. {0}','B. {1}','C. {2}','D. {0, 1, 2}'],answer:2,explanation:'A = {1, 2}，B = {0, 2}，A ∩ B = {2}。'},
+      {type:'single',q:'函数 f(x) = sin(ωx + φ) 的周期为π，则 ω =',options:['A. 1/2','B. 1','C. 2','D. π'],answer:2,explanation:'周期 T = 2π/ω = π，所以 ω = 2。'},
+      {type:'single',q:'在△ABC中，若 sin A : sin B : sin C = 2 : 3 : 4，则 cos C =',options:['A. -1/4','B. -1/2','C. 1/4','D. 1/2'],answer:0,explanation:'由正弦定理 a:b:c = 2:3:4。设 a=2k, b=3k, c=4k。由余弦定理 cos C = (a²+b²-c²)/(2ab) = (4+9-16)/12 = -3/12 = -1/4。'},
+      {type:'single',q:'若 log_a (2/3) < 1，则 a 的取值范围是：',options:['A. (0, 2/3)','B. (2/3, +∞)','C. (0, 2/3) ∪ (1, +∞)','D. (2/3, 1)'],answer:2,explanation:'当 a > 1 时，log_a(2/3) < 0 < 1，成立；当 0 < a < 1 时，log_a(2/3) < 1 = log_a a，得 a < 2/3。所以 a ∈ (0, 2/3) ∪ (1, +∞)。'},
+      {type:'single',q:'从装有3个红球和2个白球的袋中任取2个球，取出的球都是红球的概率是：',options:['A. 3/10','B. 3/5','C. 2/5','D. 1/10'],answer:0,explanation:'P = C(3,2)/C(5,2) = 3/10。'},
+    ],
+    hard: [
+      {type:'single',q:'已知函数 f(x) = ln(x + √(x² + 1))，若 f(a) = 2，则 f(-a) =',options:['A. 2','B. -2','C. 0','D. 1'],answer:1,explanation:'f(-x) = ln(-x + √(x²+1)) = ln(1/(x + √(x²+1))) = -f(x)，所以 f(x) 是奇函数，f(-a) = -f(a) = -2。'},
+      {type:'single',q:'设 x, y 满足约束条件 x ≥ 0, y ≥ 0, x + y ≤ 1，则 z = 2x + y 的最大值是：',options:['A. 0','B. 1','C. 2','D. 3'],answer:2,explanation:'可行域是第一象限内的三角形，顶点为(0,0), (1,0), (0,1)。代入得 z(1,0)=2 最大。'},
+      {type:'single',q:'已知函数 f(x) = x³ - 3x² + 1，则 f(x) 的极大值为：',options:['A. 1','B. -3','C. -1','D. 2'],answer:0,explanation:"f'(x) = 3x² - 6x = 3x(x-2)，驻点 x=0 和 x=2。f''(x) = 6x-6，f''(0) = -6 < 0，所以 x=0 处取极大值 f(0) = 1。"},
+      {type:'single',q:'在数列 {aₙ} 中，a₁ = 1，aₙ₊₁ = 2aₙ + 1，则数列 {aₙ + 1} 是：',options:['A. 等差数列','B. 等比数列','C. 常数列','D. 以上都不是'],answer:1,explanation:'aₙ₊₁ + 1 = 2(aₙ + 1)，即 (aₙ₊₁+1)/(aₙ+1) = 2，所以 {aₙ+1} 是首项为2，公比为2的等比数列。'},
+      {type:'single',q:'若不等式 x² + ax + 1 ≥ 0 对一切 x ∈ R 恒成立，则 a 的取值范围是：',options:['A. [-2, 2]','B. (-2, 2)','C. (-∞, -2] ∪ [2, +∞)','D. (-∞, 2)'],answer:0,explanation:'二次函数开口向上，与x轴至多一个交点，Δ = a² - 4 ≤ 0，即 -2 ≤ a ≤ 2。'},
+      {type:'single',q:'设 F₁, F₂ 是椭圆 x²/9 + y²/4 = 1 的两个焦点，P 是椭圆上一点，则 △PF₁F₂ 的周长是：',options:['A. 6','B. 8','C. 6 + 2√5','D. 4 + 2√5'],answer:2,explanation:'a = 3, b = 2, c = √(9-4) = √5。周长 = PF₁ + PF₂ + F₁F₂ = 2a + 2c = 6 + 2√5。'},
+      {type:'single',q:'设 a > 0，b > 0，若 a + b = 1，则 1/a + 1/b 的最小值是：',options:['A. 2','B. 3','C. 4','D. 5'],answer:2,explanation:'1/a + 1/b = (a+b)/a + (a+b)/b = 2 + b/a + a/b ≥ 2 + 2√(b/a · a/b) = 4。当 a = b = 1/2 时取等号。'},
+      {type:'single',q:'已知等差数列 {aₙ} 的前 n 项和为 Sₙ，若 S₉ = 72，则 a₅ =',options:['A. 6','B. 8','C. 9','D. 10'],answer:1,explanation:'S₉ = 9a₅ = 72（等差数列前奇数项和 = 项数×中间项），所以 a₅ = 8。'},
+      {type:'single',q:'函数 f(x) = (eˣ - e⁻ˣ) / 2 是：',options:['A. 奇函数，且在 R 上单调递增','B. 偶函数，且在 R 上单调递增','C. 奇函数，且在 R 上单调递减','D. 偶函数，且在 R 上单调递减'],answer:0,explanation:'f(-x) = (e⁻ˣ - eˣ)/2 = -f(x)，是奇函数。f\'(x) = (eˣ + e⁻ˣ)/2 > 0，在 R 上单调递增。'},
+      {type:'single',q:'若 (1 - 2x)⁷ = a₀ + a₁x + a₂x² + ... + a₇x⁷，则 a₁ + a₂ + ... + a₇ =',options:['A. -2','B. -1','C. 0','D. 1'],answer:0,explanation:'令 x = 0 得 a₀ = 1。令 x = 1 得 a₀ + a₁ + ... + a₇ = (-1)⁷ = -1。所以 a₁ + ... + a₇ = -1 - 1 = -2。'},
+      {type:'single',q:'设 m, n 是两条不同的直线，α, β 是两个不同的平面，则下列命题正确的是：',options:['A. 若 m ⊥ n，n ⊂ α，则 m ⊥ α','B. 若 m ∥ α，n ∥ α，则 m ∥ n','C. 若 m ⊥ α，n ⊥ α，则 m ∥ n','D. 若 m ∥ α，α ∩ β = n，则 m ∥ n'],answer:2,explanation:'垂直于同一平面的两条直线平行，这是线面垂直的性质定理。'},
+      {type:'single',q:'若双曲线 x²/a² - y²/b² = 1 的一条渐近线与直线 2x + y = 0 平行，则其离心率为：',options:['A. √3','B. √5','C. √5/2','D. 2'],answer:1,explanation:'渐近线斜率为 ±b/a。与 2x+y=0 平行即斜率为 -2，所以 b/a = 2。e = c/a = √(1 + b²/a²) = √(1+4) = √5。'},
+      {type:'single',q:'已知定义在 R 上的偶函数 f(x) 在 [0, +∞) 上单调递增，且 f(1) = 0，则不等式 f(x-2) > 0 的解集是：',options:['A. (1, 3)','B. (-∞, 1) ∪ (3, +∞)','C. (2, +∞)','D. (3, +∞)'],answer:1,explanation:'f(x) 是偶函数，在 [0,+∞) 上递增，f(1)=0。f(x) > 0 等价于 |x| > 1。所以 f(x-2) > 0 等价于 |x-2| > 1，即 x > 3 或 x < 1。'},
+      {type:'single',q:'若直线 y = x + b 与圆 x² + y² = 2 相切，则 b =',options:['A. ±√2','B. ±2','C. ±1','D. ±2√2'],answer:1,explanation:'圆心(0,0)到直线 x - y + b = 0 的距离 d = |b|/√2 = r = √2。所以 |b| = 2，b = ±2。'},
+      {type:'single',q:'设 f(x) = x·eˣ，则 f(x) 的极小值为：',options:['A. -1/e','B. -e','C. 1/e','D. e'],answer:0,explanation:"f'(x) = eˣ + x·eˣ = eˣ(1+x) = 0，x = -1。f''(x) = eˣ(2+x)，f''(-1) = e⁻¹ > 0，极小值。f(-1) = -1·e⁻¹ = -1/e。"},
+      {type:'single',q:'在△ABC中，已知 a = 2，b = √2，A = 45°，则 B =',options:['A. 30°','B. 60°','C. 30° 或 150°','D. 60° 或 120°'],answer:0,explanation:'由正弦定理：a/sin A = b/sin B，2/sin 45° = √2/sin B，2/(√2/2) = √2/sin B，2√2 = √2/sin B，sin B = 1/2，B = 30° 或 150°。因为 b < a，所以 B < A = 45°，所以 B = 30°。'},
+      {type:'single',q:'已知数列 {aₙ} 满足 a₁ = 1，且 aₙ = aₙ₋₁ + n（n ≥ 2），则 a₁₀ =',options:['A. 45','B. 55','C. 56','D. 66'],answer:1,explanation:'aₙ = a₁ + (2+3+...+n) = n(n+1)/2。a₁₀ = 10×11/2 = 55。'},
+      {type:'judge',q:'等差数列的前 n 项和一定是关于 n 的二次函数。',options:['正确','错误'],answer:1,explanation:'当公差 d = 0 时，Sₙ = na₁，是一次函数，不是二次函数。'},
+      {type:'single',q:'已知抛物线 y² = 4x 的焦点为 F，点 A 在抛物线上，且 |AF| = 3，则点 A 的横坐标为：',options:['A. 1','B. 2','C. 3','D. 4'],answer:1,explanation:'抛物线 y² = 4x，p = 2，焦点 F(1,0)。由抛物线定义，|AF| = x_A + p/2 = x_A + 1 = 3，所以 x_A = 2。'},
+      {type:'single',q:'从6名志愿者中选出4人分别从事翻译、导游、导购、保洁四项不同的工作，其中甲乙两人不能从事翻译工作，则不同的选派方案共有：',options:['A. 96种','B. 180种','C. 240种','D. 280种'],answer:2,explanation:'先选翻译：除甲乙外的4人选1人，有4种。剩下3项工作从余下5人中选3人排列：A(5,3)=60。共 4×60 = 240 种。'},
+      {type:'single',q:'甲、乙两人独立地解同一问题，甲解决这个问题的概率是 p₁，乙解决这个问题的概率是 p₂，那么恰好有1人解决这个问题的概率是：',options:['A. p₁p₂','B. p₁ + p₂ - 2p₁p₂','C. 1 - p₁p₂','D. 1 - (1-p₁)(1-p₂)'],answer:1,explanation:'恰好1人解决 = 甲解决乙未解决 + 甲未解决乙解决 = p₁(1-p₂) + (1-p₁)p₂ = p₁ + p₂ - 2p₁p₂。'},
+      {type:'single',q:'设 Sₙ 是等差数列 {aₙ} 的前 n 项和，若 a₁ = -2017，S₆ - 2S₃ = 18，则 S₂₀₁₉ =',options:['A. -2017','B. 2017','C. 0','D. 2019'],answer:3,explanation:'设公差为 d。S₆ = 6a₁ + 15d，S₃ = 3a₁ + 3d。S₆ - 2S₃ = 9d = 18，d = 2。S₂₀₁₉ = 2019a₁ + 2019×2018/2 × d = 2019×(-2017) + 2019×2018 = 2019。'},
+      {type:'single',q:'若函数 f(x) = log_a (x² - 2x + 3) 有最大值 2，则 a =',options:['A. 1/2','B. √2','C. 2','D. 4'],answer:1,explanation:'令 g(x) = x² - 2x + 3 = (x-1)² + 2 ≥ 2。若 a > 1，则 f(x) 有最小值 log_a 2；若 0 < a < 1，则 f(x) 有最大值 log_a 2 = 2，即 a² = 2。但题目说最大值2，应该是 0 < a < 1 时的情况，此时 a² = 2 无解。让我重新理解：应该是最小值为2，即 a > 1 时 log_a 2 = 2，a = √2。选B。'},
+      {type:'single',q:'若变量 x, y 满足 x + y ≤ 1, x ≥ 0, y ≥ 0，则 z = x + 2y 的最大值为：',options:['A. 0','B. 1','C. 2','D. 3'],answer:2,explanation:'可行域顶点为(0,0), (1,0), (0,1)。z(0,1) = 0 + 2 = 2 最大。'},
+      {type:'single',q:'已知正方体 ABCD-A₁B₁C₁D₁ 的棱长为2，则三棱锥 A-B₁CD₁ 的体积为：',options:['A. 4/3','B. 8/3','C. 4','D. 8'],answer:1,explanation:'三棱锥 A-B₁CD₁ 的底面 B₁CD₁ 是边长为 2√2 的正三角形，面积 = (√3/4)×8 = 2√3。高 = 正方体体对角线的 1/3 = 2√3/3。体积 = 1/3 × 2√3 × 2√3/3 = 1/3 × 4×3/3 = 4/3... 不对，让我重新算。更简单的方法：正方体体积 = 8，减去4个角上的小三棱锥，每个体积 = 1/3 × (1/2×2×2) × 2 = 4/3，4个就是 16/3。所以中间三棱锥体积 = 8 - 16/3 = 8/3。'},
+      {type:'single',q:'已知函数 f(x) = 2sin(ωx + φ) (ω > 0) 的图像关于直线 x = π/3 对称，且 f(π/12) = 0，则 ω 的最小值为：',options:['A. 1','B. 2','C. 3','D. 4'],answer:1,explanation:'对称轴到相邻零点的距离是 T/4。π/3 - π/12 = π/4 = T/4，T = π。ω = 2π/T = 2。'},
+      {type:'single',q:'若函数 f(x) = x² + ax + b 在区间 [0, 1] 上的最大值为 M，最小值为 m，则 M - m',options:['A. 与 a 有关，且与 b 有关','B. 与 a 有关，但与 b 无关','C. 与 a 无关，且与 b 无关','D. 与 a 无关，但与 b 有关'],answer:1,explanation:'b 不影响 M - m（因为最大值最小值都有b，相减消去了），a 影响对称轴位置从而影响最值差。'},
+      {type:'single',q:'设等比数列 {aₙ} 的前 n 项和为 Sₙ，若 S₆/S₃ = 3，则 S₉/S₆ =',options:['A. 2','B. 7/3','C. 8/3','D. 3'],answer:2,explanation:'S₃, S₆-S₃, S₉-S₆ 成等比数列。设 S₃ = m，则 S₆ = 3m，S₆-S₃ = 2m。公比为 2，所以 S₉-S₆ = 4m，S₉ = 7m。S₉/S₆ = 7m/3m = 7/3？不对，让我再算：S₃ = m，S₆ = 3m，S₆-S₃ = 2m，公比 = 2m/m = 2，所以 S₉-S₆ = 4m，S₉ = 7m，S₉/S₆ = 7/3。选B。'},
+      {type:'single',q:'已知椭圆 x²/a² + y²/b² = 1 (a > b > 0) 的离心率为 √3/2，过右焦点 F 且斜率为 k (k > 0) 的直线与椭圆相交于 A, B 两点。若向量 AF = 3向量 FB，则 k =',options:['A. 1','B. √2','C. √3','D. 2'],answer:1,explanation:'e = c/a = √3/2，c = √3a/2，b = a/2。由 AF = 3FB，得 y_A = -3y_B。联立椭圆与直线方程，用韦达定理可解得 k = √2。'},
+      {type:'single',q:'已知正四面体的棱长为2，则其体积为：',options:['A. 2√2/3','B. 4√2/3','C. 2√3/3','D. 4√3/3'],answer:0,explanation:'正四面体体积公式 V = √2a³/12。a = 2，V = √2×8/12 = 2√2/3。'},
+    ]
+  },
+  // 英语题库：简单25题 + 中等25题 + 困难25题 = 75题
+  english: {
+    easy: [
+      {type:'single',q:'I ___ a student.',options:['A.am','B.is','C.are','D.be'],answer:0,explanation:'第一人称单数I后面用am。'},
+      {type:'single',q:'What is the plural form of "box"?',options:['A.boxs','B.boxies','C.boxes','D.box'],answer:2,explanation:'以x, s, sh, ch结尾的可数名词变复数加-es。'},
+      {type:'single',q:'He ___ to school every day.',options:['A.go','B.goes','C.going','D.gone'],answer:1,explanation:'第三人称单数，一般现在时动词加-s/es。go的第三人称单数是goes。'},
+      {type:'single',q:'There ___ a book on the desk.',options:['A.have','B.has','C.is','D.are'],answer:2,explanation:'There be句型，后面是单数a book，所以用is。'},
+      {type:'single',q:'— ___ is your name? — My name is Tom.',options:['A.What','B.Who','C.How','D.Where'],answer:0,explanation:'问名字用what。'},
+      {type:'single',q:'She has ___ apple.',options:['A.a','B.an','C.the','D./'],answer:1,explanation:'apple以元音音素开头，用an。'},
+      {type:'single',q:'My brother is ___ than me.',options:['A.tall','B.taller','C.tallest','D.more tall'],answer:1,explanation:'两者比较用比较级，tall的比较级是taller。'},
+      {type:'single',q:'I like ___ football after school.',options:['A.play','B.plays','C.playing','D.played'],answer:2,explanation:'like后面接动名词或不定式，like doing sth表示喜欢做某事。'},
+      {type:'single',q:'___ you like some coffee?',options:['A.Do','B.Would','C.Are','D.Is'],answer:1,explanation:'Would you like... 是礼貌地询问对方是否想要某物。'},
+      {type:'single',q:'The book is ___ the table.',options:['A.in','B.on','C.at','D.to'],answer:1,explanation:'在桌子上面用on。'},
+      {type:'single',q:'He can ___ English very well.',options:['A.speak','B.speaks','C.speaking','D.spoke'],answer:0,explanation:'情态动词can后面接动词原形。'},
+      {type:'single',q:'— How old are you? — I\'m ___ years old.',options:['A.fiveth','B.fifth','C.five','D.fives'],answer:2,explanation:'表示年龄用基数词，五岁是five years old。'},
+      {type:'single',q:'It\'s time ___ bed.',options:['A.to','B.for','C.at','D.in'],answer:1,explanation:'It\'s time for sth 表示"该做某事了"。'},
+      {type:'single',q:'She is a ___ girl.',options:['A.beautiful','B.beautifully','C.beauty','D.more beautiful'],answer:0,explanation:'修饰名词girl用形容词beautiful。'},
+      {type:'single',q:'I have two ___.',options:['A.pen','B.pens','C.penes','D.penc'],answer:1,explanation:'pen的复数是pens，一般加-s。'},
+      {type:'single',q:'— Whose bag is this? — It\'s ___.',options:['A.her','B.she','C.hers','D.she\'s'],answer:2,explanation:'hers是名词性物主代词，相当于her bag。'},
+      {type:'single',q:'They ___ watching TV now.',options:['A.is','B.are','C.am','D.be'],answer:1,explanation:'主语they是复数，现在进行时用are。'},
+      {type:'single',q:'___ is the weather today?',options:['A.What','B.How','C.Where','D.When'],answer:1,explanation:'问天气怎么样用how。'},
+      {type:'single',q:'I usually get up ___ 6:30 in the morning.',options:['A.in','B.on','C.at','D.for'],answer:2,explanation:'在具体时间点前用介词at。'},
+      {type:'single',q:'This is ___ interesting book.',options:['A.a','B.an','C.the','D./'],answer:1,explanation:'interesting以元音音素开头，用an。'},
+      {type:'single',q:'— Thank you very much. — ___',options:['A.You\'re welcome.','B.No, thanks.','C.OK.','D.Yes, please.'],answer:0,explanation:'回答感谢用You\'re welcome（不客气）。'},
+      {type:'single',q:'There ___ some milk in the glass.',options:['A.have','B.has','C.is','D.are'],answer:2,explanation:'milk是不可数名词，There be句型用is。'},
+      {type:'single',q:'She ___ her homework every evening.',options:['A.do','B.does','C.doing','D.did'],answer:1,explanation:'第三人称单数she，一般现在时动词用does。'},
+      {type:'single',q:'— Where is my pencil? — ___ in your pencil-box.',options:['A.They are','B.It is','C.There is','D.This is'],answer:1,explanation:'pencil是单数，用It is。'},
+      {type:'single',q:'My father is a ___. He works in a hospital.',options:['A.teacher','B.doctor','C.worker','D.farmer'],answer:1,explanation:'在医院工作的是doctor（医生）。'},
+    ],
+    medium: [
+      {type:'single',q:'She is good ___ math.',options:['A.in','B.at','C.on','D.for'],answer:1,explanation:'be good at 表示"擅长"，固定搭配。'},
+      {type:'single',q:'The book ___ by him yesterday.',options:['A.wrote','B.was written','C.is written','D.writing'],answer:1,explanation:'被动语态过去时：was/were + 过去分词。'},
+      {type:'single',q:'I have been learning English ___ three years.',options:['A.since','B.for','C.in','D.at'],answer:1,explanation:'for+时间段，表示动作持续了多久。since+时间点。'},
+      {type:'single',q:'He asked me ___ I had finished my homework.',options:['A.that','B.what','C.if','D.which'],answer:2,explanation:'if引导宾语从句，表示"是否"。'},
+      {type:'single',q:'If it ___ tomorrow, we will stay at home.',options:['A.rains','B.will rain','C.rained','D.rain'],answer:0,explanation:'条件状语从句中，主将从现——主句将来时，从句一般现在时。'},
+      {type:'single',q:'The film ___ for ten minutes when we got there.',options:['A.had begun','B.had been on','C.has begun','D.began'],answer:1,explanation:'begin是瞬间动词，不能与for ten minutes连用，用be on表示"放映中"的状态。'},
+      {type:'single',q:'___ it is! Let\'s go swimming.',options:['A.How fine day','B.What a fine day','C.What fine day','D.How a fine day'],answer:1,explanation:'感叹句：What + a/an + 形容词 + 可数名词单数 + 主语 + 谓语！'},
+      {type:'single',q:'He was late for school ___ he got up late.',options:['A.so','B.because','C.but','D.though'],answer:1,explanation:'because引导原因状语从句，表示"因为"。'},
+      {type:'single',q:'I don\'t know ___ to do next.',options:['A.what','B.how','C.why','D.when'],answer:0,explanation:'what to do = 做什么。how to do it = 怎么做。'},
+      {type:'single',q:'The boy ___ is talking to our teacher is Tom.',options:['A.whom','B.whose','C.who','D.which'],answer:2,explanation:'who引导定语从句，指代人，在从句中作主语。'},
+      {type:'single',q:'He has ___ been to Beijing, has he?',options:['A.never','B.ever','C.already','D.just'],answer:0,explanation:'反义疑问句前否后肯，后面是has he肯定，前面要用否定词never。'},
+      {type:'single',q:'Could you tell me ___?',options:['A.where does he live','B.where he lives','C.where did he live','D.where he lived'],answer:1,explanation:'宾语从句用陈述语序，且Could you tell me是委婉语气，不用过去时。'},
+      {type:'single',q:'It is very kind ___ you to help me.',options:['A.for','B.of','C.to','D.with'],answer:1,explanation:'It is kind of sb to do sth 表示"某人做某事真善良"。kind描述人的品质用of。'},
+      {type:'single',q:'He used to ___ late, but now he is used to ___ early.',options:['A.sleep, get up','B.sleeping, get up','C.sleep, getting up','D.sleeping, getting up'],answer:2,explanation:'used to do 过去常常做某事；be used to doing 习惯于做某事。'},
+      {type:'single',q:'___ interesting the book is!',options:['A.How','B.What','C.What an','D.How an'],answer:0,explanation:'感叹句：How + 形容词/副词 + 主语 + 谓语！'},
+      {type:'single',q:'Neither Tom nor his friends ___ going to the park.',options:['A.is','B.are','C.was','D.be'],answer:1,explanation:'neither...nor... 遵循就近原则，friends是复数，用are。'},
+      {type:'single',q:'I would rather ___ at home than ___ out.',options:['A.stay, go','B.staying, going','C.to stay, to go','D.stayed, went'],answer:0,explanation:'would rather do sth than do sth 宁愿做某事而不愿做某事。'},
+      {type:'single',q:'By the time he arrived, we ___ the work.',options:['A.finished','B.have finished','C.had finished','D.finish'],answer:2,explanation:'by the time引导的时间状语从句，从句过去时，主句用过去完成时。'},
+      {type:'single',q:'This is the best film ___ I have ever seen.',options:['A.which','B.that','C.what','D.it'],answer:1,explanation:'先行词被最高级the best修饰时，关系代词只能用that。'},
+      {type:'single',q:'He suggested that we ___ a meeting.',options:['A.hold','B.held','C.would hold','D.holding'],answer:0,explanation:'suggest（建议）后面的宾语从句用虚拟语气：should + 动词原形，should可省略。'},
+      {type:'single',q:'The more you read, ___ you know.',options:['A.the more','B.more','C.the most','D.most'],answer:0,explanation:'the + 比较级, the + 比较级：越……越……'},
+      {type:'single',q:'It was ___ that we went for a picnic.',options:['A.so fine day','B.such fine weather','C.such a fine weather','D.so fine weather'],answer:1,explanation:'weather是不可数名词，用such fine weather。so + 形容词/副词，such + 名词。'},
+      {type:'single',q:'Not until he came back ___ the truth.',options:['A.I knew','B.did I know','C.I did know','D.knew I'],answer:1,explanation:'Not until位于句首，主句要部分倒装。'},
+      {type:'single',q:'I regret ___ you that you didn\'t pass the exam.',options:['A.telling','B.to tell','C.told','D.tell'],answer:1,explanation:'regret to do 遗憾地要做某事（还没做）；regret doing 后悔做了某事。'},
+      {type:'single',q:'The reason ___ he was late was ___ he missed the bus.',options:['A.why, that','B.why, because','C.that, why','D.because, that'],answer:0,explanation:'The reason why... is that... 是固定句型：……的原因是……'},
+    ],
+    hard: [
+      {type:'single',q:'Which of the following is NOT a complex sentence?',options:['A.I know that he is right.','B.She came and he left.','C.What he said is true.','D.The fact that he lied surprised me.'],answer:1,explanation:'B是并列句（由and连接），不是复合句。复合句包含主句和从句。'},
+      {type:'single',q:'___, I would have given you his address.',options:['A.If you asked me','B.Had you asked me','C.Should you ask me','D.If you have asked me'],answer:1,explanation:'与过去事实相反的虚拟语气，Had you asked me = If you had asked me。'},
+      {type:'single',q:'It was in the park ___ I met an old friend yesterday.',options:['A.where','B.that','C.which','D.in which'],answer:1,explanation:'强调句型：It is/was + 被强调部分 + that + 其他。'},
+      {type:'single',q:'He stood there, ___ what to do.',options:['A.wondering','B.wondered','C.to wonder','D.wonder'],answer:0,explanation:'现在分词作伴随状语，逻辑主语是he，主动关系用现在分词。'},
+      {type:'single',q:'___ no bus, we had to walk home.',options:['A.There was','B.There being','C.Being','D.It being'],answer:1,explanation:'独立主格结构：There being no bus = 因为没有公交车。'},
+      {type:'single',q:'The teacher, with 6 girls and 8 boys of her class, ___ visiting a museum when the earthquake struck.',options:['A.was','B.were','C.had been','D.would be'],answer:0,explanation:'with...是介词短语，不影响主语单复数。主语是the teacher，单数，用was。'},
+      {type:'single',q:'Hardly ___ when it began to rain.',options:['A.had he arrived','B.he had arrived','C.did he arrive','D.he arrived'],answer:0,explanation:'Hardly...when... 句型，主句用过去完成时，且hardly在句首要倒装。'},
+      {type:'single',q:'Only in this way ___ progress.',options:['A.you can make','B.can you make','C.you make','D.make you'],answer:1,explanation:'Only + 状语位于句首，主句部分倒装。'},
+      {type:'single',q:'I wish I ___ a bird.',options:['A.am','B.was','C.were','D.be'],answer:2,explanation:'wish引导的虚拟语气，与现在事实相反用过去时，be动词一律用were。'},
+      {type:'single',q:'The book is worth ___.',options:['A.read','B.reading','C.to read','D.being read'],answer:1,explanation:'be worth doing 值得做某事，主动形式表示被动含义。'},
+      {type:'single',q:'I can\'t help ___ when I heard the funny story.',options:['A.laugh','B.laughing','C.to laugh','D.laughed'],answer:1,explanation:'can\'t help doing sth 忍不住做某事。'},
+      {type:'single',q:'This is the very book ___ I am looking for.',options:['A.which','B.that','C.what','D.where'],answer:1,explanation:'先行词被the very修饰时，关系代词只能用that。'},
+      {type:'single',q:'___ is well known to all, China is a developing country.',options:['A.Which','B.As','C.That','D.What'],answer:1,explanation:'As引导非限制性定语从句，可放在句首，指代整个主句。'},
+      {type:'single',q:'He insisted that he ___ right and that we ___ to him.',options:['A.was, listen','B.be, listen','C.was, listened','D.be, listened'],answer:0,explanation:'insist作"坚持认为"时从句用陈述语气；作"坚持要求"时从句用虚拟语气(should)+动词原形。'},
+      {type:'single',q:'The number of people invited ___ fifty, but a number of them ___ absent.',options:['A.were, was','B.was, was','C.was, were','D.were, were'],answer:2,explanation:'the number of作主语谓语用单数；a number of作主语谓语用复数。'},
+      {type:'single',q:'I\'m examining the article he has just finished ___ the possible mistakes in it.',options:['A.correcting','B.to correct','C.corrected','D.correct'],answer:1,explanation:'to correct作目的状语。he has just finished是定语从句修饰the article，不影响主句结构。'},
+      {type:'single',q:'Is this factory ___ you visited last week?',options:['A.which','B.that','C.the one','D.where'],answer:2,explanation:'this factory是主语，句子缺少表语（先行词），用the one作表语，后面省略了关系代词that。'},
+      {type:'single',q:'Under no circumstances ___ first.',options:['A.we should attack','B.should we attack','C.we attack','D.attack we'],answer:1,explanation:'Under no circumstances（绝不）位于句首，句子部分倒装。'},
+      {type:'single',q:'He is no longer the man ___ he was ten years ago.',options:['A.which','B.who','C.that','D.whom'],answer:2,explanation:'先行词是人且在从句中作表语时，关系代词用that不用who/whom。'},
+      {type:'single',q:'I\'d rather you ___ tomorrow.',options:['A.come','B.came','C.will come','D.have come'],answer:1,explanation:'would rather后面接从句时用虚拟语气，与将来事实相反用过去时。'},
+      {type:'single',q:'___ all his efforts, he still failed the exam.',options:['A.Despite of','B.In spite of','C.Although','D.Because of'],answer:1,explanation:'in spite of = despite 尽管，后面接名词。although后面接从句。'},
+      {type:'single',q:'It\'s high time that we ___ action.',options:['A.take','B.took','C.will take','D.have taken'],answer:1,explanation:'It\'s (high) time that... 句型中从句用过去时（或should+动词原形，should不省略）。'},
+      {type:'single',q:'The boy ___ himself to his parents was lying.',options:['A.devoted','B.devoting','C.who devoted','D.which devoted'],answer:1,explanation:'现在分词短语作定语，devote oneself to 致力于……，主动关系用现在分词。'},
+      {type:'single',q:'Little ___ about his own safety, though he was in great danger.',options:['A.he cared','B.did he care','C.he did care','D.cared he'],answer:1,explanation:'Little（很少，几乎不）表示否定意义的词位于句首，句子部分倒装。'},
+      {type:'single',q:'So difficult ___ it to work out the problem that I decided to ask the teacher.',options:['A.I did find','B.did I find','C.I found','D.found I'],answer:1,explanation:'So + 形容词/副词位于句首，主句部分倒装。'},
+    ]
+  },
+  // 信息技术题库：简单25题 + 中等25题 + 困难25题 = 75题
+  it: {
+    easy: [
+      {type:'single',q:'二进制数 1010 转换为十进制是：',options:['A. 8','B. 10','C. 12','D. 16'],answer:1,explanation:'1×8 + 0×4 + 1×2 + 0×1 = 10。'},
+      {type:'judge',q:'计算机内部所有的信息都是用二进制表示的。',options:['正确','错误'],answer:0,explanation:'计算机采用二进制存储和处理所有数据，因为电路只有通和断两种状态。'},
+      {type:'single',q:'下列属于输入设备的是：',options:['A. 显示器','B. 打印机','C. 键盘','D. 音箱'],answer:2,explanation:'键盘是输入设备，显示器、打印机、音箱都是输出设备。'},
+      {type:'single',q:'1GB = ___ MB。',options:['A. 100','B. 1000','C. 1024','D. 2048'],answer:2,explanation:'计算机存储单位换算：1GB = 1024MB，1MB = 1024KB，1KB = 1024B。'},
+      {type:'single',q:'下列软件中，属于系统软件的是：',options:['A. Word','B. Windows','C. Photoshop','D. QQ'],answer:1,explanation:'Windows是操作系统，属于系统软件。其他都是应用软件。'},
+      {type:'single',q:'十进制数 15 转换为二进制是：',options:['A. 1101','B. 1110','C. 1111','D. 1001'],answer:2,explanation:'15 = 8+4+2+1 = 1111(2)。'},
+      {type:'judge',q:'CPU由运算器和控制器组成。',options:['正确','错误'],answer:0,explanation:'中央处理器（CPU）由运算器和控制器组成，是计算机的核心部件。'},
+      {type:'single',q:'下列不属于计算机病毒特点的是：',options:['A. 传染性','B. 破坏性','C. 免疫性','D. 潜伏性'],answer:2,explanation:'计算机病毒具有传染性、破坏性、潜伏性、隐蔽性等特点，没有免疫性。'},
+      {type:'single',q:'在计算机中，一个字节由___位二进制数组成。',options:['A. 2','B. 4','C. 8','D. 16'],answer:2,explanation:'1字节（Byte）= 8位（bit）。'},
+      {type:'single',q:'下列属于输出设备的是：',options:['A. 鼠标','B. 扫描仪','C. 打印机','D. 键盘'],answer:2,explanation:'打印机是输出设备，鼠标、扫描仪、键盘都是输入设备。'},
+      {type:'judge',q:'ROM是只读存储器，断电后数据不会丢失。',options:['正确','错误'],answer:0,explanation:'ROM（只读存储器）只能读取不能写入，断电后数据不丢失。RAM断电后数据会丢失。'},
+      {type:'single',q:'www.baidu.com 中的"com"代表：',options:['A. 教育机构','B. 商业机构','C. 政府部门','D. 网络服务机构'],answer:1,explanation:'.com表示商业机构；.edu表示教育；.gov表示政府；.net表示网络服务机构。'},
+      {type:'single',q:'计算机网络最主要的功能是：',options:['A. 提高运算速度','B. 资源共享','C. 自动控制','D. 降低成本'],answer:1,explanation:'计算机网络的主要功能是资源共享和数据通信。'},
+      {type:'single',q:'按拓扑结构划分，计算机网络不包括：',options:['A. 星型','B. 环型','C. 总线型','D. 分支型'],answer:3,explanation:'常见的网络拓扑结构有星型、环型、总线型、树型、网状等，没有分支型。'},
+      {type:'single',q:'下列文件扩展名中，属于图片文件的是：',options:['A. .mp3','B. .jpg','C. .txt','D. .exe'],answer:1,explanation:'.jpg是图片文件；.mp3是音频文件；.txt是文本文件；.exe是可执行文件。'},
+      {type:'judge',q:'删除到回收站的文件不能恢复。',options:['正确','错误'],answer:1,explanation:'回收站里的文件可以恢复到原来的位置。只有清空回收站后才彻底删除。'},
+      {type:'single',q:'IP地址由___个字节组成。',options:['A. 2','B. 3','C. 4','D. 5'],answer:2,explanation:'IPv4地址由4个字节（32位）组成，通常用点分十进制表示，如192.168.1.1。'},
+      {type:'single',q:'下列关于计算机的叙述，正确的是：',options:['A. 计算机体积越大，功能越强','B. 主频是衡量CPU性能的重要指标','C. 内存容量越大，速度越慢','D. 硬盘是内存储器'],answer:1,explanation:'主频（时钟频率）是衡量CPU性能的重要指标之一。'},
+      {type:'single',q:'在Excel中，单元格地址A1属于：',options:['A. 相对引用','B. 绝对引用','C. 混合引用','D. 以上都不是'],answer:0,explanation:'A1是相对引用；$A$1是绝对引用；$A1或A$1是混合引用。'},
+      {type:'single',q:'电子邮件地址的格式是：',options:['A. 用户名@域名','B. 域名@用户名','C. 用户名#域名','D. 用户名.域名'],answer:0,explanation:'电子邮件地址格式为：用户名@域名，如user@example.com。'},
+      {type:'judge',q:'高级语言编写的程序可以直接被计算机执行。',options:['正确','错误'],answer:1,explanation:'高级语言需要经过编译或解释转换成机器语言后，计算机才能执行。'},
+      {type:'single',q:'HTTP协议的默认端口号是：',options:['A. 21','B. 25','C. 80','D. 110'],answer:2,explanation:'HTTP默认端口80；FTP默认端口21；SMTP默认端口25；POP3默认端口110。'},
+      {type:'single',q:'下列关于算法的叙述，错误的是：',options:['A. 算法必须有输出','B. 算法的步骤必须有限','C. 算法必须有输入','D. 算法的每一步都必须明确'],answer:2,explanation:'算法可以有0个或多个输入，但必须至少有一个输出。'},
+      {type:'single',q:'在Word中，"复制"的快捷键是：',options:['A. Ctrl+X','B. Ctrl+C','C. Ctrl+V','D. Ctrl+Z'],answer:1,explanation:'Ctrl+C是复制；Ctrl+X是剪切；Ctrl+V是粘贴；Ctrl+Z是撤销。'},
+      {type:'single',q:'人工智能的英文缩写是：',options:['A. AI','B. IT','C. CPU','D. VR'],answer:0,explanation:'AI（Artificial Intelligence）人工智能；IT是信息技术；CPU是中央处理器；VR是虚拟现实。'},
+    ],
+    medium: [
+      {type:'multi',q:'下列属于编程语言的有（多选）：',options:['A. Python','B. HTML','C. Java','D. C++'],answer:'0,2,3',explanation:'Python、Java、C++都是编程语言。HTML是标记语言，不是编程语言。'},
+      {type:'single',q:'算法的三种基本结构是：',options:['A. 顺序、选择、循环','B. 输入、处理、输出','C. 开始、执行、结束','D. 定义、调用、返回'],answer:0,explanation:'算法的三种基本控制结构：顺序结构、选择结构（分支）、循环结构。'},
+      {type:'single',q:'十进制数 25 转换为二进制是：',options:['A. 10011','B. 10101','C. 11001','D. 11010'],answer:2,explanation:'25 = 16+8+1 = 11001(2)。'},
+      {type:'single',q:'在Excel中，函数 SUM(A1:A3) 等价于：',options:['A. A1 + A3','B. A1 + A2 + A3','C. A1 × A2 × A3','D. (A1+A3)/2'],answer:1,explanation:'SUM是求和函数，SUM(A1:A3) = A1 + A2 + A3。'},
+      {type:'single',q:'下列关于计算机网络的叙述，错误的是：',options:['A. LAN是局域网的英文缩写','B. WAN是广域网的英文缩写','C. 局域网的覆盖范围比广域网大','D. 互联网是最大的广域网'],answer:2,explanation:'局域网（LAN）覆盖范围小，广域网（WAN）覆盖范围大。'},
+      {type:'judge',q:'TCP/IP协议是互联网的基础协议。',options:['正确','错误'],answer:0,explanation:'TCP/IP协议族是互联网最基本的协议，是互联网的核心。'},
+      {type:'multi',q:'下列属于操作系统的有（多选）：',options:['A. Windows','B. Linux','C. Android','D. Office'],answer:'0,1,2',explanation:'Windows、Linux、Android都是操作系统。Office是应用软件。'},
+      {type:'single',q:'八进制数 12 转换为十进制是：',options:['A. 10','B. 12','C. 14','D. 20'],answer:0,explanation:'1×8 + 2 = 10。'},
+      {type:'single',q:'下列关于数据库的叙述，错误的是：',options:['A. 数据库是存储数据的仓库','B. 关系数据库以二维表的形式存储数据','C. SQL是结构化查询语言','D. 数据库中不能有重复的数据'],answer:3,explanation:'数据库中可以有重复数据，通过主键来唯一标识每条记录。'},
+      {type:'single',q:'冒泡排序的基本思想是：',options:['A. 选择最小的放到前面','B. 相邻元素比较交换，大的往后移','C. 分而治之','D. 逐个插入到已排序序列中'],answer:1,explanation:'冒泡排序通过相邻元素两两比较交换，使较大的元素逐渐"浮"到后面。'},
+      {type:'single',q:'在Word中，要设置首行缩进，应该使用：',options:['A. 字体设置','B. 段落设置','C. 页面设置','D. 样式设置'],answer:1,explanation:'首行缩进属于段落格式，在段落设置中调整。'},
+      {type:'multi',q:'下列关于信息安全的说法，正确的有（多选）：',options:['A. 密码越长越安全','B. 不要随意点击陌生链接','C. 定期备份重要数据','D. 使用公共WiFi时可以放心转账'],answer:'0,1,2',explanation:'公共WiFi不安全，不要在上面进行转账等敏感操作。其他都是正确的安全习惯。'},
+      {type:'single',q:'十六进制数 1A 转换为十进制是：',options:['A. 16','B. 26','C. 36','D. 42'],answer:1,explanation:'1×16 + 10 = 26。十六进制中A代表10。'},
+      {type:'single',q:'下列关于栈和队列的说法，正确的是：',options:['A. 栈是先进先出','B. 队列是先进后出','C. 栈是后进先出','D. 栈和队列都是线性结构，操作方式相同'],answer:2,explanation:'栈是后进先出（LIFO），队列是先进先出（FIFO），两者操作方式不同。'},
+      {type:'judge',q:'结构化程序设计的三种基本结构是顺序、选择、循环。',options:['正确','错误'],answer:0,explanation:'顺序结构、选择结构（分支）、循环结构是结构化程序设计的三种基本结构。'},
+      {type:'single',q:'下列关于数组的说法，错误的是：',options:['A. 数组是相同类型数据的集合','B. 数组元素的下标从0开始','C. 数组的长度可以任意改变','D. 数组可以通过下标访问元素'],answer:2,explanation:'数组的长度在创建时确定，之后不能随意改变（在大多数编程语言中）。'},
+      {type:'single',q:'在Excel中，若要统计满足条件的单元格数量，应使用的函数是：',options:['A. SUM','B. AVERAGE','C. COUNTIF','D. MAX'],answer:2,explanation:'COUNTIF函数用于统计满足某个条件的单元格数量。'},
+      {type:'multi',q:'下列属于人工智能应用的有（多选）：',options:['A. 语音识别','B. 图像识别','C. 专家系统','D. 打字练习'],answer:'0,1,2',explanation:'语音识别、图像识别、专家系统都是人工智能的应用领域。打字练习不是。'},
+      {type:'single',q:'OSI七层参考模型的最底层是：',options:['A. 网络层','B. 数据链路层','C. 物理层','D. 传输层'],answer:2,explanation:'OSI七层模型从下到上：物理层、数据链路层、网络层、传输层、会话层、表示层、应用层。'},
+      {type:'single',q:'下列软件中，用于图像处理的是：',options:['A. Photoshop','B. Word','C. Excel','D. PowerPoint'],answer:0,explanation:'Photoshop是专业的图像处理软件。'},
+      {type:'single',q:'选择排序的基本思想是：',options:['A. 每趟选出最小（大）的放到指定位置','B. 相邻元素比较交换','C. 分而治之递归排序','D. 逐个插入到已排序序列'],answer:0,explanation:'选择排序每趟从待排序记录中选出最小（或最大）的，放到已排序序列的末尾。'},
+      {type:'multi',q:'下列关于计算机病毒的说法，正确的有（多选）：',options:['A. 计算机病毒是一种程序','B. 计算机病毒具有传染性','C. 安装杀毒软件就一定不会中毒','D. 计算机病毒可以自我复制'],answer:'0,1,3',explanation:'计算机病毒是人为编写的具有破坏性的程序，具有传染性、自我复制等特点。安装杀毒软件也不能100%保证不中毒。'},
+      {type:'single',q:'在计算机中，ASCII码用于表示：',options:['A. 图像','B. 音频','C. 字符','D. 视频'],answer:2,explanation:'ASCII码是美国信息交换标准代码，用于表示英文字符。'},
+      {type:'single',q:'下列关于二叉树的叙述，正确的是：',options:['A. 二叉树的每个节点最多有两个子节点','B. 二叉树只有左子树没有右子树','C. 二叉树的度一定是2','D. 二叉树是一种非线性结构，所以不能顺序存储'],answer:0,explanation:'二叉树的每个节点最多有两个子节点（左子节点和右子节点）。二叉树的度可以小于2。完全二叉树可以顺序存储。'},
+      {type:'single',q:'二分查找（折半查找）的前提条件是：',options:['A. 数据量小','B. 数据有序','C. 数据量大','D. 数据是整数'],answer:1,explanation:'二分查找要求数据必须是有序的，每次比较中间元素，将查找范围缩小一半。'},
+    ],
+    hard: [
+      {type:'single',q:'栈的特点是：',options:['A. 先进先出','B. 先进后出','C. 随机存取','D. 双端存取'],answer:1,explanation:'栈是后进先出（LIFO）结构，只能在栈顶进行插入和删除操作。'},
+      {type:'judge',q:'TCP协议是无连接的传输协议。',options:['正确','错误'],answer:1,explanation:'TCP是面向连接的可靠传输协议。UDP才是无连接的不可靠传输协议。'},
+      {type:'single',q:'快速排序的平均时间复杂度是：',options:['A. O(n)','B. O(n²)','C. O(nlog₂n)','D. O(log₂n)'],answer:2,explanation:'快速排序的平均时间复杂度是O(nlog₂n)，最坏情况是O(n²)。'},
+      {type:'single',q:'以下关于进程和线程的说法，错误的是：',options:['A. 进程是资源分配的基本单位','B. 线程是CPU调度的基本单位','C. 一个进程可以包含多个线程','D. 进程之间可以共享内存空间'],answer:3,explanation:'进程有独立的地址空间，进程间不能直接共享内存。线程共享所属进程的内存空间。'},
+      {type:'single',q:'在数据结构中，链表相对于数组的优势是：',options:['A. 随机访问速度快','B. 插入删除效率高','C. 占用内存少','D. 查找效率高'],answer:1,explanation:'链表插入删除只需修改指针，效率高。数组支持随机访问，但插入删除需要移动元素。'},
+      {type:'multi',q:'下列关于面向对象的说法，正确的有（多选）：',options:['A. 封装','B. 继承','C. 多态','D. 递归'],answer:'0,1,2',explanation:'封装、继承、多态是面向对象的三大特征。递归是一种编程方法，不是面向对象的特征。'},
+      {type:'single',q:'深度优先搜索（DFS）通常使用什么数据结构实现？',options:['A. 队列','B. 栈','C. 数组','D. 链表'],answer:1,explanation:'深度优先搜索使用栈（或递归，本质也是栈）实现。广度优先搜索使用队列实现。'},
+      {type:'single',q:'哈希表查找的平均时间复杂度是：',options:['A. O(1)','B. O(n)','C. O(log n)','D. O(n²)'],answer:0,explanation:'哈希表通过哈希函数直接定位，平均时间复杂度是O(1)。'},
+      {type:'single',q:'下列关于二叉排序树的叙述，正确的是：',options:['A. 左子树所有节点的值都大于根节点','B. 右子树所有节点的值都小于根节点','C. 中序遍历结果是有序的','D. 前序遍历结果是有序的'],answer:2,explanation:'二叉排序树左子树都小于根，右子树都大于根。中序遍历（左-根-右）结果是升序的。'},
+      {type:'single',q:'TCP三次握手的目的是：',options:['A. 加密数据','B. 确认双方的收发能力，建立可靠连接','C. 压缩数据','D. 路由选择'],answer:1,explanation:'TCP三次握手是为了确认双方的发送和接收能力，建立可靠的连接。'},
+      {type:'multi',q:'下列属于数据库管理系统的有（多选）：',options:['A. MySQL','B. Oracle','C. MongoDB','D. Photoshop'],answer:'0,1,2',explanation:'MySQL、Oracle是关系型数据库管理系统，MongoDB是非关系型数据库。Photoshop是图像处理软件。'},
+      {type:'single',q:'图的深度优先遍历类似于二叉树的：',options:['A. 前序遍历','B. 中序遍历','C. 后序遍历','D. 层次遍历'],answer:0,explanation:'图的深度优先遍历（DFS）类似于二叉树的前序遍历，都是尽可能深地访问。'},
+      {type:'single',q:'下列排序算法中，最坏时间复杂度为O(nlog n)的是：',options:['A. 冒泡排序','B. 快速排序','C. 归并排序','D. 简单选择排序'],answer:2,explanation:'归并排序的最坏、最好、平均时间复杂度都是O(nlog n)。快速排序最坏是O(n²)。冒泡和选择排序是O(n²)。'},
+      {type:'judge',q:'白盒测试是根据程序的内部逻辑来设计测试用例的。',options:['正确','错误'],answer:0,explanation:'白盒测试又称结构测试，根据程序内部逻辑和结构设计测试用例。黑盒测试只看输入输出。'},
+      {type:'single',q:'下列关于递归的说法，错误的是：',options:['A. 递归必须有终止条件','B. 递归就是函数自己调用自己','C. 递归的效率一定比循环高','D. 递归可能导致栈溢出'],answer:2,explanation:'递归由于函数调用的开销，效率通常比循环低，而且可能栈溢出。'},
+      {type:'single',q:'在一个具有n个顶点的无向完全图中，边的数量是：',options:['A. n','B. n(n-1)/2','C. n(n+1)/2','D. n²'],answer:1,explanation:'无向完全图每个顶点与其他n-1个顶点都有边相连，总边数 = n(n-1)/2。'},
+      {type:'multi',q:'下列关于线性表的说法，正确的有（多选）：',options:['A. 顺序表支持随机访问','B. 链表插入删除效率高','C. 顺序表插入删除效率高','D. 链表支持随机访问'],answer:'0,1',explanation:'顺序表（数组）支持随机访问，但插入删除需要移动元素。链表插入删除只需修改指针，但只能顺序访问。'},
+      {type:'single',q:'在关系数据库中，用来表示实体之间联系的是：',options:['A. 树结构','B. 网结构','C. 二维表','D. 线性表'],answer:2,explanation:'关系数据库用二维表来表示实体及实体之间的联系。'},
+      {type:'single',q:'下列关于软件生命周期的叙述，正确的顺序是：',options:['A. 需求分析→设计→编码→测试→维护','B. 设计→需求分析→编码→测试→维护','C. 编码→设计→需求分析→测试→维护','D. 需求分析→编码→设计→测试→维护'],answer:0,explanation:'软件生命周期典型顺序：需求分析→软件设计→编码实现→软件测试→运行维护。'},
+      {type:'single',q:'若一棵二叉树的前序遍历是ABDECF，中序遍历是DBEAFC，则后序遍历是：',options:['A. DEBFCA','B. DBEFCA','C. DEBCFA','D. DBEF AC'],answer:0,explanation:'前序确定根A，中序确定左子树DBE、右子树FC。递归可得后序：DEB F C A → DEBFCA。'},
+      {type:'single',q:'以下不属于网络安全技术的是：',options:['A. 防火墙','B. 入侵检测','C. 数据加密','D. 数据压缩'],answer:3,explanation:'数据压缩是为了减少存储空间，不属于网络安全技术。'},
+      {type:'single',q:'在操作系统中，死锁产生的必要条件不包括：',options:['A. 互斥条件','B. 占有并等待','C. 可剥夺条件','D. 循环等待'],answer:2,explanation:'死锁的四个必要条件：互斥、占有并等待、不可剥夺、循环等待。可剥夺不会产生死锁。'},
+      {type:'single',q:'折半查找的时间复杂度是：',options:['A. O(1)','B. O(n)','C. O(log n)','D. O(n²)'],answer:2,explanation:'折半查找每次比较后查找范围缩小一半，时间复杂度为O(log₂n)。'},
+      {type:'single',q:'以下哪种排序算法是稳定的？',options:['A. 快速排序','B. 堆排序','C. 归并排序','D. 简单选择排序'],answer:2,explanation:'归并排序是稳定排序。快速排序、堆排序、简单选择排序都是不稳定的。'},
+      {type:'single',q:'结构化程序设计强调的是：',options:['A. 程序的效率','B. 程序的规模','C. 程序的易读性','D. 程序的可移植性'],answer:2,explanation:'结构化程序设计强调程序的清晰性和易读性，通过三种基本结构来组织程序。'},
+    ]
+  },
+  history: {
+    easy: [
+      {type:'single',q:'中国历史上第一个统一的多民族封建国家是：',options:['A.秦朝','B.汉朝','C.唐朝','D.周朝'],answer:0,explanation:'公元前221年，秦始皇统一六国。'},
+      {type:'judge',q:'郑和下西洋发生在明朝。',options:['正确','错误'],answer:0,explanation:'郑和七次下西洋，明成祖朱棣时期开始。'},
+    ],
+    medium: [
+      {type:'single',q:'下列属于洋务运动代表人物的是：',options:['A.康有为','B.曾国藩','C.孙中山','D.陈独秀'],answer:1,explanation:'曾国藩是洋务运动代表，创办安庆内军械所。'},
+      {type:'judge',q:'《辛丑条约》的签订标志着中国完全沦为半殖民地半封建社会。',options:['正确','错误'],answer:0,explanation:'1901年《辛丑条约》标志着中国完全沦为半殖民地半封建社会。'},
+    ],
+    hard: [
+      {type:'single',q:'下列关于文艺复兴的表述，正确的是：',options:['A.起源于英国','B.核心思想是启蒙运动','C.强调人文主义','D.发生于17世纪'],answer:2,explanation:'文艺复兴起源于意大利，核心是人文主义。'},
+    ]
+  },
+  politics: {
+    easy: [
+      {type:'single',q:'我国的根本政治制度是：',options:['A.人民代表大会制度','B.政治协商制度','C.民族区域自治制度','D.基层群众自治制度'],answer:0,explanation:'人民代表大会制度是我国的根本政治制度。'},
+      {type:'judge',q:'中国共产党的领导是中国特色社会主义最本质的特征。',options:['正确','错误'],answer:0,explanation:'十九大报告中明确提出。'},
+    ],
+    medium: [
+      {type:'single',q:'下列关于社会主义市场经济的表述，错误的是：',options:['A.坚持公有制为主体','B.以共同富裕为目标','C.完全由市场调节','D.加强宏观调控'],answer:2,explanation:'社会主义市场经济需要宏观调控，不是完全由市场调节。'},
+      {type:'judge',q:'马克思主义哲学的核心是辩证唯物主义和历史唯物主义。',options:['正确','错误'],answer:0,explanation:'辩证唯物主义和历史唯物主义是马克思主义哲学的组成部分。'},
+    ],
+    hard: [
+      {type:'single',q:'矛盾的普遍性和特殊性的关系是：',options:['A.整体与部分的关系','B.共性与个性的关系','C.原因与结果的关系','D.现象与本质的关系'],answer:1,explanation:'矛盾的普遍性是共性，特殊性是个性。'},
+    ]
+  },
+  geo: {
+    easy: [
+      {type:'single',q:'地球的公转周期约为：',options:['A.24小时','B.365天','C.30天','D.12小时'],answer:1,explanation:'地球绕太阳公转一周约365天。'},
+      {type:'judge',q:'地球的自转产生了昼夜交替现象。',options:['正确','错误'],answer:0,explanation:'地球自转一周约24小时，产生昼夜交替。'},
+    ],
+    medium: [
+      {type:'single',q:'下列属于板块构造学说的是：',options:['A.地球是平的','B.地壳由板块组成','C.地球在变大','D.地心在膨胀'],answer:1,explanation:'板块构造学说认为地壳由六大板块组成。'},
+    ],
+    hard: [
+      {type:'single',q:'关于大气环流，下列说法正确的是：',options:['A.赤道地区为高压','B.极地为低压','C.中纬度为西风带','D.副热带为东风带'],answer:2,explanation:'中纬度地区盛行西风。'},
+    ]
+  },
+  physics: {
+    easy: [
+      {type:'single',q:'力的国际单位是：',options:['A.千克','B.牛顿','C.瓦特','D.焦耳'],answer:1,explanation:'力的SI单位是牛顿(N)，简称牛。'},
+      {type:'judge',q:'物体不受力时一定静止。',options:['正确','错误'],answer:1,explanation:'根据牛顿第一定律，物体不受力时保持静止或匀速直线运动状态。'},
+      {type:'single',q:'重力加速度g约为：',options:['A.8.9 m/s²','B.9.8 m/s²','C.10.8 m/s²','D.9.6 m/s²'],answer:1,explanation:'地球表面重力加速度g≈9.8 m/s²，粗略计算时可取10 m/s²。'},
+      {type:'single',q:'下列物理量属于矢量的是：',options:['A.质量','B.时间','C.速度','D.温度'],answer:2,explanation:'速度既有大小又有方向，是矢量；质量、时间、温度只有大小没有方向，是标量。'},
+      {type:'judge',q:'力的作用效果与力的大小、方向和作用点都有关。',options:['正确','错误'],answer:0,explanation:'力的三要素：大小、方向、作用点，都会影响力的作用效果。'},
+      {type:'single',q:'下列属于力的单位的是：',options:['A.瓦特','B.焦耳','C.牛顿','D.帕斯卡'],answer:2,explanation:'牛顿(N)是力的单位，瓦特是功率单位，焦耳是能量单位，帕斯卡是压强单位。'},
+      {type:'single',q:'1N等于：',options:['A.1 kg·m/s','B.1 kg·m/s²','C.1 kg/s²','D.1 m/s²'],answer:1,explanation:'根据F=ma，1N=1kg×1m/s²=1kg·m/s²。'},
+      {type:'judge',q:'匀速直线运动的物体加速度为零。',options:['正确','错误'],answer:0,explanation:'匀速直线运动速度大小和方向不变，加速度为零。'},
+      {type:'single',q:'下列关于弹力的说法正确的是：',options:['A.弹力方向与形变方向相同','B.弹力方向与形变方向相反','C.弹力方向与形变无关','D.弹力总是竖直向上'],answer:1,explanation:'弹力方向总是与物体形变方向相反，试图恢复原状。'},
+      {type:'single',q:'滑动摩擦力的方向总是：',options:['A.与运动方向相同','B.与运动方向相反','C.与运动方向垂直','D.与运动方向无关'],answer:1,explanation:'滑动摩擦力总是与相对运动方向相反，阻碍物体间的相对滑动。'},
+      {type:'judge',q:'重力的方向总是竖直向下。',options:['正确','错误'],answer:0,explanation:'重力的方向始终竖直向下，指向地心。'},
+      {type:'single',q:'下列关于惯性的说法正确的是：',options:['A.速度越大惯性越大','B.质量越大惯性越大','C.只有运动的物体才有惯性','D.只有静止的物体才有惯性'],answer:1,explanation:'惯性大小只与质量有关，质量越大惯性越大，与运动状态无关。'},
+      {type:'single',q:'1m/s等于多少km/h：',options:['A.2.6','B.3.6','C.4.6','D.5.6'],answer:1,explanation:'1m/s=3.6km/h，单位换算时乘以3.6。'},
+      {type:'judge',q:'力的合成遵循平行四边形定则。',options:['正确','错误'],answer:0,explanation:'力的合成是矢量运算，遵循平行四边形定则。'},
+      {type:'single',q:'下列关于功的说法正确的是：',options:['A.力越大做功越多','B.位移越大做功越多','C.力和位移同向时做功最多','D.力和位移垂直时做功最多'],answer:2,explanation:'W=Fs cosθ，力和位移同向(θ=0)时cosθ=1，做功最多。'},
+      {type:'single',q:'功率的单位是：',options:['A.焦耳','B.牛顿','C.瓦特','D.帕斯卡'],answer:2,explanation:'功率的单位是瓦特(W)，1W=1J/s。'},
+      {type:'judge',q:'机械能包括动能和势能。',options:['正确','错误'],answer:0,explanation:'机械能=动能+势能（重力势能和弹性势能）。'},
+      {type:'single',q:'动能的计算公式是：',options:['A.mv','B.½mv','C.½mv²','D.mv²'],answer:2,explanation:'动能Ek=½mv²，其中m为质量，v为速度。'},
+      {type:'single',q:'重力势能的计算公式是（以地面为参考面）：',options:['A.mh','B.mgh','C.½mgh','D.gh'],answer:1,explanation:'重力势能Ep=mgh，m为质量，g为重力加速度，h为高度。'},
+      {type:'judge',q:'只有恒力才能做功。',options:['正确','错误'],answer:1,explanation:'变力也可以做功，可通过积分或动能定理计算。'},
+      {type:'single',q:'下列关于电荷的说法正确的是：',options:['A.电荷可以凭空产生','B.电荷有正负两种','C.同种电荷相互吸引','D.异种电荷相互排斥'],answer:1,explanation:'电荷有正负两种，同种电荷相互排斥，异种电荷相互吸引，电荷守恒。'},
+      {type:'single',q:'电流的单位是：',options:['A.伏特','B.安培','C.欧姆','D.瓦特'],answer:1,explanation:'电流的单位是安培(A)。'},
+      {type:'judge',q:'并联电路中各支路电压相等。',options:['正确','错误'],answer:0,explanation:'并联电路中各支路两端电压相等。'},
+      {type:'single',q:'欧姆定律的公式是：',options:['A.I=UR','B.I=U/R','C.I=R/U','D.U=I/R'],answer:1,explanation:'欧姆定律：I=U/R，电流等于电压除以电阻。'},
+      {type:'single',q:'下列关于磁场的说法正确的是：',options:['A.磁场对静止电荷有力作用','B.磁场对运动电荷可能有力作用','C.磁场方向就是电荷受力方向','D.磁场不存在能量'],answer:1,explanation:'磁场对运动电荷有力的作用（洛伦兹力），对静止电荷无力作用。'},
+    ],
+    medium: [
+      {type:'single',q:'一个物体做匀加速直线运动，初速度为2m/s，加速度为1m/s²，3秒后的速度为：',options:['A.3 m/s','B.5 m/s','C.6 m/s','D.8 m/s'],answer:1,explanation:'v=v₀+at=2+1×3=5 m/s。'},
+      {type:'judge',q:'功的单位是焦耳。',options:['正确','错误'],answer:0,explanation:'W=Fs，单位为焦耳(J)，1J=1N·m。'},
+      {type:'single',q:'一个物体从静止开始以2m/s²的加速度运动，5秒内的位移为：',options:['A.20m','B.25m','C.30m','D.50m'],answer:1,explanation:'s=½at²=½×2×5²=25m。'},
+      {type:'single',q:'质量为2kg的物体，所受合外力为6N，其加速度为：',options:['A.1 m/s²','B.2 m/s²','C.3 m/s²','D.4 m/s²'],answer:2,explanation:'由F=ma，a=F/m=6/2=3 m/s²。'},
+      {type:'judge',q:'作用力与反作用力大小相等、方向相反、作用在同一直线上。',options:['正确','错误'],answer:0,explanation:'牛顿第三定律：作用力和反作用力等大、反向、共线，作用在不同物体上。'},
+      {type:'single',q:'一个50N的力推动物体沿力方向移动了10m，做的功为：',options:['A.100J','B.250J','C.500J','D.50J'],answer:2,explanation:'W=Fs=50×10=500J。'},
+      {type:'single',q:'质量为1kg的物体从10m高处自由下落（g=10m/s²），落地时动能为：',options:['A.50J','B.100J','C.200J','D.500J'],answer:1,explanation:'Ek=mgh=1×10×10=100J（机械能守恒）。'},
+      {type:'single',q:'一个电热器两端电压为220V，通过电流为2A，其电阻为：',options:['A.55Ω','B.110Ω','C.220Ω','D.440Ω'],answer:1,explanation:'R=U/I=220/2=110Ω。'},
+      {type:'judge',q:'串联电路中电流处处相等。',options:['正确','错误'],answer:0,explanation:'串联电路中各处电流相等。'},
+      {type:'single',q:'两个10Ω的电阻并联，总电阻为：',options:['A.5Ω','B.10Ω','C.15Ω','D.20Ω'],answer:0,explanation:'并联总电阻：1/R=1/R₁+1/R₂=1/10+1/10=1/5，R=5Ω。'},
+      {type:'single',q:'一个灯泡标有"220V 100W"，正常工作时通过的电流约为：',options:['A.0.23A','B.0.45A','C.2.2A','D.4.5A'],answer:1,explanation:'I=P/U=100/220≈0.45A。'},
+      {type:'judge',q:'机械能守恒的条件是只有重力或弹力做功。',options:['正确','错误'],answer:0,explanation:'只有重力（或弹力）做功时，机械能守恒。'},
+      {type:'single',q:'一物体以10m/s的速度水平抛出，1秒后水平速度为（不计空气阻力，g=10m/s²）：',options:['A.0 m/s','B.10 m/s','C.14.1 m/s','D.20 m/s'],answer:1,explanation:'水平方向不受力，速度不变，仍为10m/s。竖直方向速度为10m/s，合速度为14.1m/s，但水平分速度仍为10m/s。'},
+      {type:'single',q:'质量为2kg的物体速度为3m/s，其动能为：',options:['A.3J','B.6J','C.9J','D.18J'],answer:2,explanation:'Ek=½mv²=½×2×3²=9J。'},
+      {type:'single',q:'一个力对物体做正功时，力与位移的夹角：',options:['A.大于90°','B.等于90°','C.小于90°','D.等于180°'],answer:2,explanation:'W=Fs cosθ，θ<90°时cosθ>0，做正功。'},
+      {type:'judge',q:'物体加速度方向一定与合外力方向相同。',options:['正确','错误'],answer:0,explanation:'由牛顿第二定律F=ma，加速度方向与合外力方向相同。'},
+      {type:'single',q:'一辆汽车以20m/s的速度匀速行驶，刹车后加速度大小为5m/s²，刹车后4秒内的位移为：',options:['A.20m','B.30m','C.40m','D.50m'],answer:2,explanation:'减速到停需时t=v/a=20/5=4s，位移s=v₀t-½at²=20×4-½×5×16=80-40=40m。'},
+      {type:'single',q:'下列关于匀速圆周运动的说法正确的是：',options:['A.速度不变','B.加速度为零','C.加速度方向指向圆心','D.合外力为零'],answer:2,explanation:'匀速圆周运动中，向心加速度指向圆心，合外力提供向心力。'},
+      {type:'single',q:'一物体质量为5kg，放在水平面上，与地面动摩擦因数为0.2，则滑动摩擦力为（g=10m/s²）：',options:['A.5N','B.10N','C.15N','D.20N'],answer:1,explanation:'f=μmg=0.2×5×10=10N。'},
+      {type:'judge',q:'电场线从正电荷出发，到负电荷终止。',options:['正确','错误'],answer:0,explanation:'电场线起于正电荷（或无穷远），止于负电荷（或无穷远）。'},
+      {type:'single',q:'一个电阻为10Ω的导体，通过2A电流时，10秒内产生的热量为：',options:['A.40J','B.100J','C.200J','D.400J'],answer:3,explanation:'Q=I²Rt=2²×10×10=400J。'},
+      {type:'single',q:'下列关于光的反射的说法正确的是：',options:['A.入射角大于反射角','B.入射角等于反射角','C.入射角小于反射角','D.入射角与反射角无关'],answer:1,explanation:'反射定律：入射角等于反射角，入射光线、反射光线和法线在同一平面内。'},
+      {type:'judge',q:'光从空气射入水中时，折射角小于入射角。',options:['正确','错误'],answer:0,explanation:'光从光疏介质（空气）射入光密介质（水）时，折射角小于入射角。'},
+      {type:'single',q:'一束光从空气射入玻璃（n=1.5），入射角为45°，则折射角约为：',options:['A.20°','B.28°','C.35°','D.45°'],answer:1,explanation:'n₁sinθ₁=n₂sinθ₂，sinθ₂=sin45°/1.5≈0.471，θ₂≈28°。'},
+      {type:'single',q:'下列关于牛顿第二定律的表达正确的是：',options:['A.F=mv','B.F=ma','C.F=m/a','D.F=a/m'],answer:1,explanation:'牛顿第二定律：F=ma，合外力等于质量乘以加速度。'},
+    ],
+    hard: [
+      {type:'single',q:'一物体从高处自由落下，落地时速度为20m/s，则下落高度约为（g=10m/s²）：',options:['A.10m','B.20m','C.30m','D.40m'],answer:1,explanation:'v²=2gh，h=v²/(2g)=400/20=20m。'},
+      {type:'single',q:'质量为0.5kg的小球以10m/s速度撞墙后以8m/s弹回，小球动量变化大小为：',options:['A.1 kg·m/s','B.5 kg·m/s','C.9 kg·m/s','D.18 kg·m/s'],answer:2,explanation:'Δp=m(v₂-v₁)=0.5×(8-(-10))=0.5×18=9 kg·m/s（取反弹方向为正）。'},
+      {type:'judge',q:'系统所受合外力为零时，系统总动量守恒。',options:['正确','错误'],answer:0,explanation:'动量守恒条件：系统不受外力或合外力为零，总动量保持不变。'},
+      {type:'single',q:'两个物体碰撞前总动量为10kg·m/s，碰撞后一个物体动量为4kg·m/s，另一个为（无外力）：',options:['A.4 kg·m/s','B.6 kg·m/s','C.10 kg·m/s','D.14 kg·m/s'],answer:1,explanation:'动量守恒：p₁+p₂=p总，p₂=10-4=6 kg·m/s。'},
+      {type:'single',q:'一个弹簧振子，弹簧劲度系数为k=20N/m，振子质量为0.2kg，其周期为（π≈3.14）：',options:['A.0.31s','B.0.63s','C.1.26s','D.2.51s'],answer:1,explanation:'T=2π√(m/k)=2×3.14×√(0.2/20)=6.28×0.1=0.628s≈0.63s。'},
+      {type:'judge',q:'在弹性碰撞中，动能和动量都守恒。',options:['正确','错误'],answer:0,explanation:'弹性碰撞中总动量和总动能都守恒；非弹性碰撞中动量守恒但动能不守恒。'},
+      {type:'single',q:'一人造卫星在距地面高度等于地球半径处绕地球运行，其速度为（已知第一宇宙速度v₁=7.9km/s）：',options:['A.3.95 km/s','B.5.59 km/s','C.7.9 km/s','D.11.2 km/s'],answer:1,explanation:'v=v₁√(R/(R+h))，h=R时，v=v₁√(1/2)=7.9×0.707≈5.59km/s。'},
+      {type:'single',q:'一个质量为2kg的物体从10m高处自由落下，落地时速度为（g=10m/s²，不计空气阻力）：',options:['A.10 m/s','B.14.1 m/s','C.20 m/s','D.200 m/s'],answer:1,explanation:'v=√(2gh)=√(2×10×10)=√200≈14.1m/s。'},
+      {type:'judge',q:'洛伦兹力只改变运动电荷的速度方向，不改变速度大小。',options:['正确','错误'],answer:0,explanation:'洛伦兹力始终与速度方向垂直，不做功，只改变速度方向不改变速度大小。'},
+      {type:'single',q:'一个电子以速度v垂直射入磁感应强度为B的匀强磁场中，做圆周运动的半径为（设电子质量m、电荷量q）：',options:['A.mv/(qB)','B.qB/(mv)','C.mvB/q','D.qv/(mB)'],answer:0,explanation:'洛伦兹力提供向心力：qvB=mv²/r，r=mv/(qB)。'},
+      {type:'single',q:'一闭合线圈面积为0.1m²，磁感应强度在0.5s内从0.2T均匀变化到0.6T，线圈中感应电动势为：',options:['A.0.02V','B.0.04V','C.0.08V','D.0.16V'],answer:2,explanation:'ε=ΔΦ/Δt=S×ΔB/Δt=0.1×(0.6-0.2)/0.5=0.1×0.4/0.5=0.08V。'},
+      {type:'judge',q:'法拉第电磁感应定律表明变化的磁场可以产生电场。',options:['正确','错误'],answer:0,explanation:'法拉第电磁感应定律：变化的磁场在闭合回路中产生感应电动势。'},
+      {type:'single',q:'一个理想变压器原线圈匝数为1000匝，副线圈为200匝，原线圈接入220V交流电，副线圈电压为：',options:['A.22V','B.44V','C.110V','D.220V'],answer:1,explanation:'U₂/U₁=n₂/n₁，U₂=220×200/1000=44V。'},
+      {type:'single',q:'质量为1kg的物体在水平面上做匀速圆周运动，半径为2m，速度为4m/s，所需的向心力为：',options:['A.2N','B.4N','C.8N','D.16N'],answer:2,explanation:'F=mv²/r=1×4²/2=8N。'},
+      {type:'judge',q:'第一类永动机不可能制成，因为它违反了能量守恒定律。',options:['正确','错误'],answer:0,explanation:'第一类永动机不消耗能量就能做功，违反能量守恒定律，不可能实现。'},
+      {type:'single',q:'一个物体从A点沿光滑斜面滑下到B点，A比B高2m，物体到B点时速度为（g=10m/s²，初速度为零）：',options:['A.2 m/s','B.4 m/s','C.6.3 m/s','D.20 m/s'],answer:2,explanation:'机械能守恒：mgh=½mv²，v=√(2gh)=√(2×10×2)=√40≈6.3m/s。'},
+      {type:'single',q:'两物体质量分别为m和2m，以相同动能运动，它们的动量之比p₁:p₂为：',options:['A.1:1','B.1:2','C.1:√2','D.√2:1'],answer:2,explanation:'Ek=½mv²→v=√(2Ek/m)，p=mv=√(2mEk)，p₁:p₂=√m:√(2m)=1:√2。'},
+      {type:'judge',q:'热传递的方向总是从高温物体到低温物体。',options:['正确','错误'],answer:0,explanation:'热力学第二定律：热量自发地从高温物体传向低温物体。'},
+      {type:'single',q:'一定质量理想气体等温压缩时，下列说法正确的是：',options:['A.内能增加','B.内能减少','C.压强增大','D.压强减小'],answer:2,explanation:'等温过程中温度不变，内能不变；体积减小，由PV=nRT知压强增大。'},
+      {type:'single',q:'一个 LC 振荡电路中，电容器所带电荷量最大时，线圈中的电流为：',options:['A.最大','B.最小（为零）','C.一半','D.不变'],answer:1,explanation:'电容器电荷量最大时电场能最大，磁场能为零，电流为零。'},
+      {type:'judge',q:'光电效应说明光具有粒子性。',options:['正确','错误'],answer:0,explanation:'光电效应中光电子的能量与光频率有关而与强度无关，说明光具有粒子性。'},
+      {type:'single',q:'氢原子从n=3能级跃迁到n=1能级时，下列说法正确的是：',options:['A.吸收光子','B.放出光子','C.不辐射光子','D.可能吸收也可能放出'],answer:1,explanation:'从高能级向低能级跃迁时放出光子；从低能级向高能级跃迁时吸收光子。'},
+      {type:'single',q:'下列关于半衰期的说法正确的是：',options:['A.温度越高半衰期越短','B.半衰期与化学状态无关','C.放射性越强半衰期越长','D.半衰期随时间变化'],answer:1,explanation:'半衰期是原子核的固有属性，与温度、压力、化学状态等外界条件无关。'},
+      {type:'judge',q:'核聚变释放的能量比相同质量的核裂变释放的能量更多。',options:['正确','错误'],answer:0,explanation:'核聚变中每个核子释放的能量比核裂变更多，聚变反应效率更高。'},
+      {type:'single',q:'下列关于质能方程E=mc²的说法正确的是：',options:['A.质量可以转化为能量','B.能量可以转化为质量','C.质量和能量是等价的','D.以上都对'],answer:3,explanation:'质能方程表明质量和能量是同一事物的不同表现，可以相互转化，即质能等价。'},
+    ]
+  },
+  chem: {
+    easy: [
+      {type:'single',q:'水的化学式是：',options:['A.H₂O','B.CO₂','C.O₂','D.H₂'],answer:0,explanation:'水分子由2个氢原子和1个氧原子组成，化学式为H₂O。'},
+      {type:'judge',q:'化学反应中原子可以创造或消灭。',options:['正确','错误'],answer:1,explanation:'原子守恒定律：化学反应中原子不增不减，只是重新组合。'},
+      {type:'single',q:'下列属于金属元素的是：',options:['A.氧','B.氢','C.铁','D.氯'],answer:2,explanation:'铁(Fe)是金属元素，氧、氢、氯是非金属元素。'},
+      {type:'single',q:'氧气的化学式是：',options:['A.O','B.O₂','C.O₃','D.H₂O'],answer:1,explanation:'氧气是双原子分子，化学式为O₂。'},
+      {type:'judge',q:'空气的主要成分是氮气和氧气。',options:['正确','错误'],answer:0,explanation:'空气约含78%氮气、21%氧气和1%其他气体。'},
+      {type:'single',q:'二氧化碳的化学式是：',options:['A.CO','B.CO₂','C.C₂O','D.C₂O₂'],answer:1,explanation:'二氧化碳由1个碳原子和2个氧原子组成，化学式CO₂。'},
+      {type:'single',q:'下列属于纯净物的是：',options:['A.空气','B.海水','C.蒸馏水','D.牛奶'],answer:2,explanation:'蒸馏水是纯水(H₂O)，是纯净物；其余都是混合物。'},
+      {type:'judge',q:'化学变化中一定有新物质生成。',options:['正确','错误'],answer:0,explanation:'化学变化的本质是有新物质生成，与物理变化（仅状态改变）不同。'},
+      {type:'single',q:'下列属于物理变化的是：',options:['A.铁生锈','B.木材燃烧','C.冰融化','D.食物腐败'],answer:2,explanation:'冰融化为水只是状态变化，没有新物质生成，是物理变化。'},
+      {type:'single',q:'原子的构成中，带正电的是：',options:['A.电子','B.质子','C.中子','D.原子核外层'],answer:1,explanation:'质子带正电，电子带负电，中子不带电。'},
+      {type:'judge',q:'分子是保持物质化学性质的最小粒子。',options:['正确','错误'],answer:0,explanation:'分子是保持物质化学性质的最小微由，原子是化学变化中的最小粒子。'},
+      {type:'single',q:'钠的元素符号是：',options:['A.Na','B.S','C.N','D.Ni'],answer:0,explanation:'钠的元素符号为Na，来自拉丁文Natrium。'},
+      {type:'single',q:'下列属于化合物的是：',options:['A.氧气','B.铁','C.水','D.金'],answer:2,explanation:'水(H₂O)由不同元素组成，是化合物；氧气、铁、金是单质。'},
+      {type:'judge',q:'催化剂在反应前后质量和化学性质不变。',options:['正确','错误'],answer:0,explanation:'催化剂改变反应速率但本身在反应前后质量和化学性质不改变。'},
+      {type:'single',q:'下列符号表示2个氢原子的是：',options:['A.H₂','B.2H','C.2H₂','D.H₂O'],answer:1,explanation:'2H表示2个氢原子，H₂表示1个氢分子含2个氢原子。'},
+      {type:'single',q:'地壳中含量最多的元素是：',options:['A.硅','B.铝','C.氧','D.铁'],answer:2,explanation:'地壳中氧含量最多(约49%)，其次是硅、铝、铁。'},
+      {type:'judge',q:'金属导电性好，非金属一般不导电。',options:['正确','错误'],answer:0,explanation:'金属有自由电子，导电性好；非金属一般无自由电子，不导电（石墨例外）。'},
+      {type:'single',q:'下列属于溶液的是：',options:['A.泥水','B.牛奶','C.盐水','D.油水混合物'],answer:2,explanation:'盐水是均一稳定的混合物，是溶液；泥水和牛奶是悬浊液/乳浊液。'},
+      {type:'single',q:'溶质溶解在溶剂中形成溶液，最常见的溶剂是：',options:['A.酒精','B.水','C.汽油','D.醋酸'],answer:1,explanation:'水是最常见的溶剂，水溶液简称溶液。'},
+      {type:'judge',q:'饱和溶液一定是不饱和溶液的相反状态，升温可互转。',options:['正确','错误'],answer:0,explanation:'对大多数固体溶质，升温可使饱和溶液变为不饱和溶液。'},
+      {type:'single',q:'下列属于金属活动顺序中最活泼的是：',options:['A.铜','B.铁','C.锌','D.钾'],answer:3,explanation:'金属活动性：K>Ca>Na>Mg>Al>Zn>Fe>...>Cu>...，钾最活泼。'},
+      {type:'single',q:'盐酸的化学式是：',options:['A.H₂SO₄','B.HCl','C.HNO₃','D.H₂CO₃'],answer:1,explanation:'盐酸是氯化氢的水溶液，化学式HCl。'},
+      {type:'judge',q:'酸和碱反应生成盐和水，叫中和反应。',options:['正确','错误'],answer:0,explanation:'中和反应：酸+碱→盐+水，是复分解反应的一种。'},
+      {type:'single',q:'下列pH值表示酸性溶液的是：',options:['A.pH=7','B.pH=8','C.pH=5','D.pH=14'],answer:2,explanation:'pH<7为酸性，pH=7中性，pH>7碱性。pH=5为酸性。'},
+      {type:'single',q:'下列属于盐的是：',options:['A.NaOH','B.HCl','C.NaCl','D.H₂O'],answer:2,explanation:'NaCl(氯化钠)是盐，NaOH是碱，HCl是酸，H₂O是氧化物。'},
+    ],
+    medium: [
+      {type:'single',q:'下列属于酸的是：',options:['A.NaCl','B.NaOH','C.HCl','D.CaO'],answer:2,explanation:'HCl是盐酸，属于酸。NaCl是盐，NaOH是碱，CaO是氧化物。'},
+      {type:'judge',q:'pH值越小，溶液酸性越强。',options:['正确','错误'],answer:0,explanation:'pH<7为酸性，数值越小酸性越强；pH>7为碱性，数值越大碱性越强。'},
+      {type:'single',q:'下列化学方程式配平正确的是：',options:['A.2H₂+O₂→2H₂O','B.H₂+O₂→H₂O','C.2H₂+O₂→H₂O','D.H₂+2O₂→2H₂O'],answer:0,explanation:'2H₂+O₂=2H₂O，左右氢原子各4个、氧原子各2个，配平正确。'},
+      {type:'single',q:'铁丝在氧气中燃烧的产物是：',options:['A.FeO','B.Fe₂O₃','C.Fe₃O₄','D.Fe(OH)₃'],answer:2,explanation:'铁在氧气中燃烧生成四氧化三铁(Fe₃O₄)，火星四射。'},
+      {type:'judge',q:'在氧化还原反应中，失去电子的物质被氧化。',options:['正确','错误'],answer:0,explanation:'失去电子→化合价升高→被氧化（氧化反应）；得到电子→被还原。'},
+      {type:'single',q:'实验室制取CO₂常用的药品是：',options:['A.大理石和稀盐酸','B.大理石和稀硫酸','C.碳酸钠和稀硫酸','D.木炭和氧气'],answer:0,explanation:'大理石(CaCO₃)和稀盐酸反应生成CO₂，不用稀硫酸因生成微溶CaSO₄阻碍反应。'},
+      {type:'single',q:'下列物质中含氢元素质量分数最大的是：',options:['A.H₂O','B.H₂SO₄','C.HCl','D.NaOH'],answer:2,explanation:'HCl中H占约2.7%，H₂O中H占约11%，H₂SO₄中H占约2%，NaOH中H占约2.5%，H₂O最大。'},
+      {type:'judge',q:'金属铝比金属铁更活泼，所以铝更容易生锈。',options:['正确','错误'],answer:1,explanation:'铝虽活泼但表面形成致密氧化膜(Al₂O₃)保护内部，反而比铁更耐腐蚀。'},
+      {type:'single',q:'质量守恒定律的内容是：',options:['A.反应前后分子数相等','B.反应前后原子种类和数目不变','C.反应前后体积不变','D.反应前后密度不变'],answer:1,explanation:'质量守恒：反应前后原子的种类和数目不变，总质量不变。'},
+      {type:'single',q:'下列反应属于置换反应的是：',options:['A.2H₂+O₂→2H₂O','B.Fe+CuSO₄→FeSO₄+Cu','C.HCl+NaOH→NaCl+H₂O','D.CaCO₃→CaO+CO₂'],answer:1,explanation:'置换反应：单质+化合物→新单质+新化合物。Fe+CuSO₄→FeSO₄+Cu符合。'},
+      {type:'judge',q:'合金是混合物，不是纯净物。',options:['正确','错误'],answer:0,explanation:'合金是两种或多种金属（或金属与非金属）熔合而成的混合物。'},
+      {type:'single',q:'20℃时NaCl溶解度为36g，该温度下100g水中最多溶解NaCl：',options:['A.18g','B.36g','C.72g','D.100g'],answer:1,explanation:'溶解度36g即100g水中最多溶36gNaCl。'},
+      {type:'single',q:'下列物质溶于水后溶液呈碱性的是：',options:['A.NaCl','B.HCl','C.NaOH','D.H₂SO₄'],answer:2,explanation:'NaOH溶于水后电离出OH⁻，溶液呈碱性。'},
+      {type:'judge',q:'浓硫酸可以用来干燥气体，因为它有吸水性。',options:['正确','错误'],answer:0,explanation:'浓硫酸有强吸水性，可作干燥剂，但不能干燥碱性气体如氨气。'},
+      {type:'single',q:'下列实验操作正确的是：',options:['A.用嘴吹灭酒精灯','B.用手直接拿药品','C.稀释浓硫酸时将酸倒入水中','D.把鼻孔凑到瓶口闻气味'],answer:2,explanation:'稀释浓硫酸必须"酸入水"并搅拌，不能"水入酸"。其余操作均不安全。'},
+      {type:'single',q:'下列化肥属于氮肥的是：',options:['A.Ca(H₂PO₄)₂','B.KCl','C.NH₄HCO₃','D.K₂SO₄'],answer:2,explanation:'NH₄HCO₃含氮元素，属氮肥。含磷的属磷肥，含钾的属钾肥。'},
+      {type:'judge',q:'化学反应中化学键的断裂和形成是化学反应的本质。',options:['正确','错误'],answer:0,explanation:'化学反应中旧键断裂、新键形成，物质发生转化。'},
+      {type:'single',q:'氢氧化钠俗称：',options:['A.熟石灰','B.纯碱','C.烧碱','D.小苏打'],answer:2,explanation:'NaOH俗称烧碱/火碱/苛性钠；Ca(OH)₂是熟石灰；Na₂CO₃是纯碱；NaHCO₃是小苏打。'},
+      {type:'single',q:'元素周期表中，原子序数等于原子的：',options:['A.中子数','B.质子数','C.电子层数','D.相对原子质量'],answer:1,explanation:'原子序数=核内质子数=核外电子数（中性原子）。'},
+      {type:'judge',q:'同位素的化学性质几乎完全相同。',options:['正确','错误'],answer:0,explanation:'同位素质子数相同电子排布相同，化学性质几乎完全相同，仅物理性质略有差异。'},
+      {type:'single',q:'下列属于有机物的是：',options:['A.CO₂','B.CH₄','C.NaCl','D.H₂SO₄'],answer:1,explanation:'CH₄(甲烷)含碳元素是有机物；CO₂、NaCl、H₂SO₄是无机物。'},
+      {type:'single',q:'乙醇（酒精）的化学式是：',options:['A.CH₃OH','B.C₂H₅OH','C.CH₃COOH','D.C₂H₂'],answer:1,explanation:'乙醇化学式为C₂H₅OH，俗称酒精。'},
+      {type:'judge',q:'甲烷是天然气的主要成分。',options:['正确','错误'],answer:0,explanation:'天然气主要成分是甲烷(CH₄)，是最简单的有机物。'},
+      {type:'single',q:'下列属于高分子化合物的是：',options:['A.乙醇','B.葡萄糖','C.淀粉','D.甲烷'],answer:2,explanation:'淀粉是多糖，属于天然高分子化合物；乙醇、葡萄糖、甲烷都是小分子。'},
+      {type:'single',q:'下列说法正确的是：',options:['A.燃烧一定要有氧气参与','B.燃烧是发光放热的氧化反应','C.燃烧不一定放热','D.燃烧不需要温度达到着火点'],answer:1,explanation:'燃烧是可燃物与氧化剂(不一定是氧气)发生的发光放热的剧烈氧化反应，需达到着火点。'},
+    ],
+    hard: [
+      {type:'single',q:'下列反应属于氧化还原反应的是：',options:['A.CaCO₃→CaO+CO₂↑','B.2H₂+O₂→2H₂O','C.NaOH+HCl→NaCl+H₂O','D.CaO+H₂O→Ca(OH)₂'],answer:1,explanation:'2H₂+O₂→2H₂O中氢元素化合价从0升到+1(被氧化)，氧元素从0降到-2(被还原)，属氧化还原反应。'},
+      {type:'judge',q:'在氧化还原反应中，氧化剂得到电子被还原。',options:['正确','错误'],answer:0,explanation:'氧化剂得电子→化合价降低→被还原→发生还原反应；还原剂失电子→被氧化。'},
+      {type:'single',q:'用氢气还原氧化铜的实验中，通入氢气前必须：',options:['A.先加热再通氢气','B.先通氢气再加热','C.同时通氢气和加热','D.只通氢气不加热'],answer:1,explanation:'先通氢气排净空气再加热，防止氢气与空气混合加热爆炸；实验结束先停止加热继续通氢气至冷却。'},
+      {type:'single',q:'已知反应2KMnO₄→K₂MnO₄+MnO₂+O₂↑，该反应中KMnO₄的作用是：',options:['A.仅作氧化剂','B.仅作还原剂','C.既是氧化剂又是还原剂','D.既不是氧化剂也不是还原剂'],answer:2,explanation:'KMnO₄中锰从+7价变为+6价和+4价(被还原)，氧从-2价变为0价(被氧化)，所以KMnO₄既是氧化剂又是还原剂。'},
+      {type:'judge',q:'原电池中，负极上发生氧化反应，正极上发生还原反应。',options:['正确','错误'],answer:0,explanation:'原电池负极失去电子被氧化，正极得到电子被还原，化学能转化为电能。'},
+      {type:'single',q:'等质量的下列金属与足量稀盐酸反应，产生氢气最多的是：',options:['A.Na','B.Mg','C.Al','D.Fe'],answer:2,explanation:'相同质量金属，Al(27g产生1g H₂)的每克产氢最多，因为Al化合价+3且摩尔质量最小(相对)。'},
+      {type:'single',q:'在一定温度下，向饱和NaCl溶液中加入少量NaCl固体，溶液浓度：',options:['A.增大','B.减小','C.不变','D.先增大后减小'],answer:2,explanation:'饱和溶液中加入溶质不会继续溶解，溶液浓度不变。'},
+      {type:'judge',q:'电解水时，正极产生氧气，负极产生氢气，体积比约为1:2。',options:['正确','错误'],answer:0,explanation:'电解水：2H₂O→2H₂↑+O₂↑，负极氢气体积是正极氧气体积的2倍。'},
+      {type:'single',q:'下列离子能在溶液中大量共存的是：',options:['A.Ag⁺和Cl⁻','B.Ba²⁺和SO₄²⁻','C.K⁺和NO₃⁻','D.Ca²⁺和CO₃²⁻'],answer:2,explanation:'K⁺和NO₃⁻不发生任何反应，可大量共存。AgCl、BaSO₄、CaCO₃都是沉淀，不能共存。'},
+      {type:'single',q:'将铁片放入CuSO₄溶液中，一段时间后：',options:['A.铁片质量增大','B.铁片质量减小','C.溶液颜色变浅','D.溶液颜色变深'],answer:2,explanation:'Fe+CuSO₄→FeSO₄+Cu，铜析出附在铁片上质量增加，Cu²⁺减少溶液蓝色变浅。'},
+      {type:'judge',q:'化学反应的速率与温度、浓度、催化剂和反应物接触面积都有关。',options:['正确','错误'],answer:0,explanation:'增大浓度、提高温度、使用催化剂、增大接触面积都能加快反应速率。'},
+      {type:'single',q:'下列可燃物不完全燃烧的产物中可能含有：',options:['A.仅CO₂','B.CO和CO₂','C.仅H₂O','D.仅CO'],answer:1,explanation:'不完全燃烧时碳不完全氧化，产物中同时含CO和CO₂。'},
+      {type:'single',q:'某元素原子核外有3个电子层，最外层有7个电子，该元素属于：',options:['A.金属元素','B.非金属元素','C.稀有气体元素','D.无法判断'],answer:1,explanation:'最外层7个电子(>4)易得到1个电子达到8电子稳定结构，是非金属元素（如氯）。'},
+      {type:'judge',q:'化学平衡是动态平衡，正反应和逆反应速率相等但都仍在进行。',options:['正确','错误'],answer:0,explanation:'化学平衡是动态平衡：v正=v逆≠0，反应物和生成物浓度不再改变。'},
+      {type:'single',q:'下列关于化学键的说法正确的是：',options:['A.离子键是阴阳离子间的静电作用','B.共价键只在非金属原子间形成','C.金属键只存在于纯金属中','D.化学键断裂不吸收能量'],answer:0,explanation:'离子键是阴阳离子之间的静电作用；共价键主要在非金属间形成但也可在金属与非金属间形成(如AlCl₃)。'},
+      {type:'single',q:'一定量的铁与足量稀硫酸反应，若反应产生0.2g氢气，则参加反应的铁的质量为：',options:['A.2.8g','B.5.6g','C.8.4g','D.11.2g'],answer:1,explanation:'Fe+H₂SO₄→FeSO₄+H₂↑，56g铁产生2g氢气，产生0.2g需铁=56×0.2/2=5.6g。'},
+      {type:'judge',q:'活泼金属的冶炼通常用电解法，因为金属离子很难被还原。',options:['正确','错误'],answer:0,explanation:'活泼金属(如钠、钾、铝)的离子很难被还原，需用电解熔融化合物的方法冶炼。'},
+      {type:'single',q:'下列关于葡萄糖的说法正确的是：',options:['A.葡萄糖是双糖','B.葡萄糖的化学式是C₆H₁₂O₆','C.葡萄糖不能发生银镜反应','D.葡萄糖只存在于动物体内'],answer:1,explanation:'葡萄糖(C₆H₁₂O₆)是单糖，能发生银镜反应（有醛基），存在于动植物体内。'},
+      {type:'single',q:'在Fe₂O₃中，铁元素的化合价为：',options:['A.+1','B.+2','C.+3','D.+6'],answer:2,explanation:'氧为-2价，Fe₂O₃中3×(-2)+2x=0，x=+3，铁为+3价。'},
+      {type:'judge',q:'可逆反应达到平衡后，改变条件可使平衡移动。',options:['正确','错误'],answer:0,explanation:'改变温度、浓度或压强等条件，可使化学平衡发生移动（勒夏特列原理）。'},
+      {type:'single',q:'下列物质既能与酸反应又能与碱反应的是：',options:['A.NaCl','B.Al₂O₃','C.CuO','D.CO₂'],answer:1,explanation:'Al₂O₃是两性氧化物，既能与酸反应(生成铝盐)又能与碱反应(生成偏铝酸盐)。'},
+      {type:'single',q:'已知反应N₂+3H₂⇌2NH₃是放热反应，下列条件有利于提高NH₃产率的是：',options:['A.升高温度','B.降低温度','C.减小压强','D.增大反应物浓度'],answer:1,explanation:'降低温度有利于放热反应正向进行(平衡正移)，增大NH₃产率；但温度过低反应速率太慢。'},
+      {type:'judge',q:'钢铁腐蚀主要是电化学腐蚀，吸氧腐蚀比析氢腐蚀更常见。',options:['正确','错误'],answer:0,explanation:'在中性或弱酸性环境中，钢铁发生吸氧腐蚀(正极O₂得电子)，比析氢腐蚀更普遍。'},
+      {type:'single',q:'下列关于相对原子质量的叙述正确的是：',options:['A.相对原子质量就是原子的实际质量','B.相对原子质量的单位是克','C.相对原子质量≈质子数+中子数','D.相对原子质量与同位素无关'],answer:2,explanation:'相对原子质量是以¹²C的1/12为标准，近似等于质子数+中子数(质量数)；同位素的相对原子质量不同。'},
+    ]
+  },
+  bio: {
+    easy: [
+      {type:'single',q:'生命活动的基本单位是：',options:['A.原子','B.分子','C.细胞','D.器官'],answer:2,explanation:'细胞是生物体结构和功能的基本单位。'},
+      {type:'judge',q:'光合作用产生氧气。',options:['正确','错误'],answer:0,explanation:'光合作用过程中水分子被光解，释放出O₂。'},
+      {type:'single',q:'下列属于生物的是：',options:['A.病毒','B.岩石','C.水','D.空气'],answer:0,explanation:'病毒具有遗传物质能繁殖，属于生物（但无细胞结构）。'},
+      {type:'single',q:'植物进行光合作用的场所是：',options:['A.线粒体','B.叶绿体','C.细胞核','D.核糖体'],answer:1,explanation:'叶绿体含有叶绿素，是光合作用的场所。'},
+      {type:'judge',q:'呼吸作用只在线粒体中进行。',options:['正确','错误'],answer:1,explanation:'有氧呼吸第一阶段在细胞质基质，第二三阶段在线粒体；无氧呼吸在细胞质基质。'},
+      {type:'single',q:'遗传物质DNA主要存在于：',options:['A.细胞膜','B.细胞质','C.细胞核','D.细胞壁'],answer:2,explanation:'DNA主要存在于细胞核中的染色体上，少量在线粒体和叶绿体中。'},
+      {type:'single',q:'下列属于动物细胞结构的是：',options:['A.细胞壁','B.叶绿体','C.中心体','D.大液泡'],answer:2,explanation:'中心体存在于动物细胞，参与细胞分裂；细胞壁、叶绿体、大液泡是植物细胞特有的。'},
+      {type:'judge',q:'酶是活细胞产生的具有催化作用的有机物。',options:['正确','错误'],answer:0,explanation:'酶是活细胞产生的生物催化剂，绝大多数酶是蛋白质，少数是RNA。'},
+      {type:'single',q:'ATP的中文全称是：',options:['A.腺苷二磷酸','B.三磷酸腺苷','C.脱氧核糖核酸','D.核糖核酸'],answer:1,explanation:'ATP全称三磷酸腺苷，是细胞内的主要能量载体。'},
+      {type:'single',q:'下列不属于人体四大组织的是：',options:['A.上皮组织','B.结缔组织','C.肌肉组织','D.分生组织'],answer:3,explanation:'人体四大组织：上皮、结缔、肌肉、神经组织。分生组织是植物的组织。'},
+      {type:'judge',q:'细菌没有成形的细胞核。',options:['正确','错误'],answer:0,explanation:'细菌是原核生物，没有成形的细胞核，DNA裸露存在于拟核中。'},
+      {type:'single',q:'下列属于原核生物的是：',options:['A.酵母菌','B.大肠杆菌','C.草履虫','D.蘑菇'],answer:1,explanation:'大肠杆菌是细菌（原核生物）；酵母菌、蘑菇是真菌（真核）；草履虫是原生生物。'},
+      {type:'single',q:'光合作用的原料是：',options:['A.有机物和氧气','B.二氧化碳和水','C.葡萄糖和氧气','D.淀粉和水'],answer:1,explanation:'光合作用：CO₂+H₂O→(光/叶绿体)→有机物+O₂，原料是CO₂和水。'},
+      {type:'judge',q:'植物的蒸腾作用主要通过叶片气孔进行。',options:['正确','错误'],answer:0,explanation:'植物水分通过叶片气孔以水蒸气形式散失，99%吸收的水分通过蒸腾作用散失。'},
+      {type:'single',q:'下列血管中血流速度最快的是：',options:['A.动脉','B.静脉','C.毛细血管','D.小静脉'],answer:0,explanation:'动脉壁最厚弹性最大，血流速度最快；毛细血管最慢利于物质交换。'},
+      {type:'single',q:'人体的造血器官是：',options:['A.肝脏','B.脾脏','C.骨髓','D.心脏'],answer:2,explanation:'成人的造血器官主要是红骨髓，产生红细胞、白细胞和血小板。'},
+      {type:'judge',q:'人体最大的器官是皮肤。',options:['正确','错误'],answer:0,explanation:'皮肤是人体最大的器官，具有保护、排泄、调节体温等功能。'},
+      {type:'single',q:'下列属于反射活动的是：',options:['A.植物向光生长','B.草履虫逃避有害刺激','C.膝跳反射','D.白细胞吞噬细菌'],answer:2,explanation:'反射是通过神经系统对刺激作出的规律性反应，膝跳反射是经典反射活动。'},
+      {type:'single',q:'人体消化吸收的主要场所是：',options:['A.口腔','B.胃','C.小肠','D.大肠'],answer:2,explanation:'小肠有大量绒毛和微绒毛，表面积大，是消化吸收的主要场所。'},
+      {type:'judge',q:'红细胞的主要功能是运输氧气。',options:['正确','错误'],answer:0,explanation:'红细胞含血红蛋白，能结合和运输O₂和部分CO₂。'},
+      {type:'single',q:'下列属于内分泌腺的是：',options:['A.唾液腺','B.汗腺','C.甲状腺','D.肠腺'],answer:2,explanation:'甲状腺分泌甲状腺激素直接进入血液，是内分泌腺；其余都是外分泌腺，有导管。'},
+      {type:'single',q:'植物根部吸收水分的主要部位是：',options:['A.根冠','B.分生区','C.伸长区','D.成熟区（根毛区）'],answer:3,explanation:'成熟区有大量根毛，大大增加吸收面积，是吸收水分和无机盐的主要部位。'},
+      {type:'judge',q:'生态系统中的能量流动是单向的、逐级递减的。',options:['正确','错误'],answer:0,explanation:'能量沿食物链单向流动，传递效率约10%-20%，逐级递减。'},
+      {type:'single',q:'一个生态系统中数量最多的是：',options:['A.生产者','B.消费者','C.分解者','D.非生物部分'],answer:0,explanation:'生产者（植物等）通过光合作用将无机物转为有机物，是生态系统中数量最多的类群。'},
+      {type:'single',q:'下列关于染色体的叙述正确的是：',options:['A.染色体只存在于生殖细胞中','B.染色体由DNA和蛋白质组成','C.同种生物染色体数目不同','D.染色体只存在于细胞核外'],answer:1,explanation:'染色体由DNA和蛋白质组成，是遗传物质的主要载体。'},
+    ],
+    medium: [
+      {type:'single',q:'DNA的双螺旋结构是谁提出的：',options:['A.孟德尔','B.达尔文','C.沃森和克里克','D.巴斯德'],answer:2,explanation:'1953年沃森和克里克提出DNA双螺旋结构，奠定了分子生物学基础。'},
+      {type:'judge',q:'减数分裂产生的子细胞染色体数目减半。',options:['正确','错误'],answer:0,explanation:'减数分裂DNA复制一次细胞分裂两次，子细胞染色体数目减半（2n→n）。'},
+      {type:'single',q:'下列关于有丝分裂的叙述正确的是：',options:['A.产生的子细胞染色体减半','B.产生的子细胞与母细胞染色体数目相同','C.不进行DNA复制','D.只发生在生殖细胞中'],answer:1,explanation:'有丝分裂保持染色体数目恒定，产生的子细胞与母细胞染色体数目相同。'},
+      {type:'single',q:'基因是有效应的DNA片段，基因的基本功能是：',options:['A.储存能量','B.传递和表达遗传信息','C.合成蛋白质','D.催化反应'],answer:1,explanation:'基因通过复制传递遗传信息，通过转录翻译表达遗传信息。'},
+      {type:'judge',q:'转录是以DNA为模板合成RNA的过程。',options:['正确','错误'],answer:0,explanation:'转录：以DNA一条链为模板，按碱基互补配对合成RNA。'},
+      {type:'single',q:'翻译的场所是：',options:['A.细胞核','B.核糖体','C.线粒体','D.叶绿体'],answer:1,explanation:'翻译在核糖体上进行，以mRNA为模板合成蛋白质。'},
+      {type:'single',q:'下列关于孟德尔遗传定律的叙述正确的是：',options:['A.分离定律适用于所有生物','B.分离定律适用于真核生物的有性生殖','C.自由组合定律适用于原核生物','D.孟德尔定律与减数分裂无关'],answer:1,explanation:'分离定律和自由组合定律适用于进行有性生殖的真核生物，与减数分裂中同源染色体分离和非同源染色体自由组合有关。'},
+      {type:'judge',q:'生物的变异都是可以遗传的。',options:['正确','错误'],answer:1,explanation:'变异分为遗传的（基因突变、重组、染色体变异）和不遗传的（环境引起）。'},
+      {type:'single',q:'下列属于伴性遗传的是：',options:['A.白化病','B.色盲症','C.糖尿病','D.高血压'],answer:1,explanation:'色盲基因位于X染色体上，属伴X隐性遗传；白化病是常染色体隐性遗传。'},
+      {type:'single',q:'神经调节的基本方式是：',options:['A.激素调节','B.反射','C.免疫','D.代谢'],answer:1,explanation:'神经调节的基本方式是反射，结构基础是反射弧。'},
+      {type:'judge',q:'生长素具有双重性，低浓度促进生长，高浓度抑制生长。',options:['正确','错误'],answer:0,explanation:'生长素浓度低时促进生长，高浓度时抑制生长（顶端优势）。'},
+      {type:'single',q:'下列激素属于植物激素的是：',options:['A.胰岛素','B.生长素','C.甲状腺激素','D.生长激素'],answer:1,explanation:'生长素（吲哚乙酸）是植物激素；胰岛素、甲状腺激素、生长激素是动物激素。'},
+      {type:'single',q:'人体血糖浓度升高时，分泌增加的激素是：',options:['A.胰岛素','B.胰高血糖素','C.肾上腺素','D.甲状腺激素'],answer:0,explanation:'胰岛素由胰岛B细胞分泌，能降低血糖浓度；胰高血糖素升高血糖。'},
+      {type:'judge',q:'人体免疫分为非特异性免疫和特异性免疫。',options:['正确','错误'],answer:0,explanation:'非特异性免疫是先天有的（如皮肤屏障、吞噬细胞），特异性免疫是后天获得的（体液免疫和细胞免疫）。'},
+      {type:'single',q:'下列属于特异性免疫的是：',options:['A.皮肤的屏障作用','B.吞噬细胞吞噬','C.抗体与抗原结合','D.胃酸杀菌'],answer:2,explanation:'抗体与抗原结合是特异性免疫中的体液免疫；其余是非特异性免疫。'},
+      {type:'single',q:'一个食物链：草→兔→狐，则狐属于：',options:['A.生产者','B.初级消费者','C.次级消费者','D.三级消费者'],answer:2,explanation:'兔是初级消费者，狐以兔为食是次级消费者（第二营养级）。'},
+      {type:'judge',q:'生物多样性的保护包括基因多样性、物种多样性和生态系统多样性。',options:['正确','错误'],answer:0,explanation:'生物多样性在三个层次：基因、物种、生态系统多样性。'},
+      {type:'single',q:'生态系统中分解者的作用是：',options:['A.将无机物合成有机物','B.分解动植物遗体为无机物','C.消耗有机物释放能量','D.固定太阳能'],answer:1,explanation:'分解者（细菌、真菌）将动植物遗体分解为无机物归还环境，促进物质循环。'},
+      {type:'single',q:'光合作用和呼吸作用的关系是：',options:['A.互不相关','B.光合作用储存能量，呼吸作用释放能量','C.两者都在白天进行','D.两者场所相同'],answer:1,explanation:'光合作用储存能量于有机物中，呼吸作用分解有机物释放能量，两者相互依存。'},
+      {type:'judge',q:'体液免疫中，B细胞受到抗原刺激后增殖分化为浆细胞和记忆细胞。',options:['正确','错误'],answer:0,explanation:'B细胞受抗原刺激后增殖分化为浆细胞（产生抗体）和记忆细胞。'},
+      {type:'single',q:'下列关于碳循环的叙述正确的是：',options:['A.碳只在生物群落中循环','B.碳以CO₂形式在生物群落与非生物环境间循环','C.碳循环不需要能量的驱动','D.碳循环与光合作用无关'],answer:1,explanation:'碳循环：生物通过光合作用固定CO₂，通过呼吸作用释放CO₂，CO₂是碳循环的主要形式。'},
+      {type:'single',q:'一个种群是指：',options:['A.一个区域的所有生物','B.同种生物所有个体的总和','C.一个区域的所有植物','D.一个生态系统中的所有个体'],answer:1,explanation:'种群是同一时间和空间内同种生物所有个体的集合。'},
+      {type:'judge',q:'群落的演替分为初生演替和次生演替。',options:['正确','错误'],answer:0,explanation:'初生演替发生在从未有过生物的环境中（如火山岩），次生演替发生在原有群落被破坏后的区域。'},
+      {type:'single',q:'下列关于生物进化的叙述正确的是：',options:['A.环境变化是生物进化的根本原因','B.自然选择决定生物进化方向','C.变异是有方向的','D.进化不需要漫长的时间'],answer:1,explanation:'自然选择决定进化方向，变异是不定向的，环境对变异进行选择，适者生存。'},
+    ],
+    hard: [
+      {type:'single',q:'下列关于遗传密码的描述，正确的是：',options:['A.一种氨基酸只有一种密码子','B.密码子有冗余性','C.所有密码子都编码氨基酸','D.密码子在DNA上'],answer:1,explanation:'一种氨基酸可有多个密码子（简并性/冗余性），有3个终止密码子不编码氨基酸，密码子在mRNA上。'},
+      {type:'judge',q:'基因突变是生物变异的根本来源，为进化提供原材料。',options:['正确','错误'],answer:0,explanation:'基因突变产生新等位基因，是可遗传变异的根本来源，为自然选择提供原材料。'},
+      {type:'single',q:'一个AaBb个体产生配子的种类（两对基因独立遗传）为：',options:['A.2种','B.4种','C.8种','D.16种'],answer:1,explanation:'AaBb自由组合，产生AB、Ab、aB、ab四种配子，比例为1:1:1:1。'},
+      {type:'single',q:'色盲基因位于X染色体上，一男性色盲(XcY)与一正常女性(携带者XCXc)婚配，后代色盲概率为：',options:['A.25%','B.50%','C.75%','D.100%'],answer:1,explanation:'后代：XCXc(正常携带)、XcXc(色盲女)、XCY(正常男)、XcY(色盲男)，4种各1/4，色盲2/4=50%。'},
+      {type:'judge',q:'等位基因分离发生在减数第一次分裂后期。',options:['正确','错误'],answer:0,explanation:'减数第一次分裂后期，同源染色体分离，等位基因随之分离（分离定律）。'},
+      {type:'single',q:'一个DNA分子含100个碱基对，其中胞嘧啶30个，腺嘌呤有：',options:['A.30个','B.40个','C.60个','D.70个'],answer:3,explanation:'DNA双链中A=T，C=G。C=30→G=30，A+T=200-60=140，A=70个。'},
+      {type:'single',q:'将小鼠小肠绒毛细胞分别放入下列溶液中，细胞体积变大的是（不考虑物质吸收）：',options:['A.生理盐水','B.0.9%NaCl','C.蒸馏水','D.5%NaCl'],answer:2,explanation:'蒸馏水浓度低于细胞内液，细胞吸水膨胀变大。'},
+      {type:'judge',q:'主动运输需要载体蛋白和消耗ATP，可逆浓度梯度运输。',options:['正确','错误'],answer:0,explanation:'主动运输需要载体和能量(ATP)，可从低浓度向高浓度运输，保证细胞按需选择性吸收。'},
+      {type:'single',q:'光合作用暗反应（卡尔文循环）中CO₂的受体是：',options:['A.ATP','B.NADPH','C.五碳化合物(C₅)','D.三碳化合物(C₃)'],answer:2,explanation:'CO₂与C₅（RuBP）结合生成2个C₃，C₃被NADPH还原最终生成糖类和再生C₅。'},
+      {type:'single',q:'有氧呼吸三个阶段中，产生ATP最多的是：',options:['A.第一阶段（糖酵解）','B.第二阶段（三羧酸循环）','C.第三阶段（电子传递链）','D.三个阶段一样多'],answer:2,explanation:'第三阶段[H]与O₂结合生成水，释放大量能量，产生约34个ATP，远多于前两阶段。'},
+      {type:'judge',q:'内环境稳态是机体进行正常生命活动的必要条件。',options:['正确','错误'],answer:0,explanation:'内环境理化性质（温度、pH、渗透压等）保持相对稳定是细胞正常代谢的前提。'},
+      {type:'single',q:'人体内环境不包括：',options:['A.血浆','B.组织液','C.淋巴','D.细胞内液'],answer:3,explanation:'内环境=细胞外液（血浆、组织液、淋巴），细胞内液不属于内环境。'},
+      {type:'single',q:'兴奋在神经元间的传递方向是：',options:['A.双向的','B.单向的（突触前膜→突触后膜）','C.随机方向','D.从树突到轴突'],answer:1,explanation:'突触处神经递质只能从突触前膜释放作用于突触后膜，兴奋单向传递。'},
+      {type:'judge',q:'HIV主要攻击人体的T淋巴细胞，导致特异性免疫功能下降。',options:['正确','错误'],answer:0,explanation:'HIV侵入并破坏辅助性T细胞，导致特异性免疫（细胞免疫和体液免疫）功能下降。'},
+      {type:'single',q:'下列关于生态金字塔的叙述正确的是：',options:['A.能量金字塔可倒置','B.数量金字塔一般不可倒置','C.生物量金字塔可能倒置','D.能量金字塔不可倒置'],answer:3,explanation:'能量流动逐级递减，能量金字塔永远不可倒置；数量和生物量金字塔可能倒置。'},
+      {type:'single',q:'在一个平衡的生态系统中，下列叙述正确的是',options:['A.能量收支平衡，物质循环平衡','B.能量输入大于输出','C.物质输入大于输出','D.种群数量持续增长'],answer:0,explanation:'生态系统稳态：能量输入与输出平衡，物质循环收支平衡，种群数量相对稳定。'},
+      {type:'judge',q:'生物圈的稳态是生物与环境之间长期相互作用形成的动态平衡。',options:['正确','错误'],answer:0,explanation:'生物圈稳态是生物与无机环境长期协同进化的结果，是一种动态平衡。'},
+      {type:'single',q:'某DNA片段一条链碱基序列为5\'-ATCGGTA-3\'，其互补链序列为（5\'→3\'）：',options:['A.5\'-ATCGGTA-3\'','B.5\'-TACCGAT-3\'','C.5\'-TAGCCAT-3\'','D.5\'-ATGCCAT-3\''],answer:1,explanation:'原链5\'-ATCGGTA-3\'，互补链3\'-TAGCCAT-5\'，反转为5\'→3\'即5\'-TACCGAT-3\'，选B。'},
+      {type:'judge',q:'基因重组只发生在减数分裂过程中。',options:['正确','错误'],answer:1,explanation:'基因重组主要发生在减数分裂（交叉互换、自由组合），但基因工程也属于人为的基因重组。'},
+      {type:'single',q:'已知小麦高秆(D)对矮秆(d)为显性，抗病(T)对感病(t)为显性，两对基因独立遗传。DdTt自交后代中矮秆抗病占：',options:['A.1/16','B.3/16','C.6/16','D.9/16'],answer:1,explanation:'dd占1/4，T_占3/4，矮秆抗病=1/4×3/4=3/16。'},
+      {type:'single',q:'下列关于基因频率的叙述正确的是',options:['A.基因频率是指某基因在所有基因中的比例','B.基因频率变化说明生物在进化','C.基因频率只受突变影响','D.基因频率不变说明没有变异'],answer:1,explanation:'生物进化的实质是种群基因频率的改变，基因频率变化意味着进化在发生。'},
+      {type:'judge',q:'共同进化是指不同物种之间在相互影响中不断进化和发展。',options:['正确','错误'],answer:0,explanation:'共同进化：不同物种之间（如捕食者与被捕食者）、生物与无机环境之间在相互影响中协同进化。'},
+      {type:'single',q:'以下关于细胞凋亡的叙述正确的是',options:['A.细胞凋亡是病理过程','B.细胞凋亡是基因控制的程序性死亡','C.细胞凋亡与基因无关','D.细胞凋亡就是细胞坏死'],answer:1,explanation:'细胞凋亡是由基因决定的程序性死亡，是正常的生理过程，与坏死（病理损伤）不同。'},
+      {type:'single',q:'下列关于PCR技术的叙述正确的是',options:['A.PCR需要DNA聚合酶和引物','B.PCR在生物体内进行','C.PCR不需要加热','D.PCR只能复制短片段'],answer:0,explanation:'PCR（聚合酶链式反应）需要TaqDNA聚合酶、引物、dNTP和温度循环，在体外大量扩增DNA。'},
+    ]
+  }
+};
+
+// ====== State ======
+let currentUser = null;
+let quizState = {
+  subject:'',
+  difficulty:'easy',
+  count:50,
+  questions:[],
+  answers:[],
+  currentIdx:0,
+  startTime:0,
+};
+
+// ====== Init ======
+async function init(){
+  // Populate category select
+  const sel = document.getElementById('reg-category');
+  CATEGORIES.forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value=c.id;
+    opt.textContent=c.fullName;
+    sel.appendChild(opt);
+  });
+
+  // Check if logged in
+  const saved = localStorage.getItem('xuejin_user');
+  if(saved){
+    currentUser = JSON.parse(saved);
+    showHome();
+  } else {
+    showPage('page-login');
+  }
+}
+
+// ====== Auth (Supabase) ======
+async function handleRegister(){
+  const name = document.getElementById('reg-name').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const password = document.getElementById('reg-password').value.trim();
+  const cat = document.getElementById('reg-category').value;
+  const errEl = document.getElementById('register-error');
+  const btn = event.target;
+  
+  errEl.classList.remove('show');
+  
+  if(!name || !phone || !password || !cat){
+    errEl.textContent='请填写所有信息';
+    errEl.classList.add('show');
+    return;
+  }
+  if(phone.length !== 11 || !/^\d+$/.test(phone)){
+    errEl.textContent='请输入正确的手机号';
+    errEl.classList.add('show');
+    return;
+  }
+  if(password.length < 6){
+    errEl.textContent='密码至少6位';
+    errEl.classList.add('show');
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = '注册中...';
+  
+  // Check if phone exists
+  const {data:existing} = await sb.from('students').select('id').eq('phone',phone).maybeSingle();
+  if(existing){
+    errEl.textContent='该手机号已注册';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = '注 册';
+    return;
+  }
+  
+  // Insert
+  const {data,error} = await sb.from('students').insert([{name,phone,password,category:cat}]).select().single();
+  btn.disabled = false;
+  btn.textContent = '注 册';
+  
+  if(error){
+    errEl.textContent='注册失败：'+error.message;
+    errEl.classList.add('show');
+    return;
+  }
+  
+  currentUser = data;
+  localStorage.setItem('xuejin_user',JSON.stringify(data));
+  alert('注册成功！请返回登录');
+  showPage('page-login');
+  document.getElementById('login-phone').value = phone;
+  document.getElementById('login-password').value = password;
+}
+
+async function handleLogin(){
+  const phone = document.getElementById('login-phone').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const errEl = document.getElementById('login-error');
+  const btn = event.target;
+  
+  errEl.classList.remove('show');
+  
+  if(!phone || !password){
+    errEl.textContent='请输入手机号和密码';
+    errEl.classList.add('show');
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = '登录中...';
+  
+  const {data,error} = await sb.from('students').select('*').eq('phone',phone).eq('password',password).maybeSingle();
+  
+  btn.disabled = false;
+  btn.textContent = '登 录';
+  
+  if(error || !data){
+    errEl.textContent='手机号或密码错误';
+    errEl.classList.add('show');
+    return;
+  }
+  
+  currentUser = data;
+  localStorage.setItem('xuejin_user',JSON.stringify(data));
+  showHome();
+}
+
+async function handleAdminLogin(){
+  const account = document.getElementById('admin-account').value.trim();
+  const password = document.getElementById('admin-password').value.trim();
+  const errEl = document.getElementById('admin-error');
+  const btn = event.target;
+  
+  errEl.classList.remove('show');
+  
+  if(!account || !password){
+    errEl.textContent='请输入管理员账号和密码';
+    errEl.classList.add('show');
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = '登录中...';
+  
+  const {data,error} = await sb.from('admins').select('*').eq('account',account).eq('password',password).maybeSingle();
+  
+  btn.disabled = false;
+  btn.textContent = '管理端登录';
+  
+  if(error || !data){
+    errEl.textContent='管理员账号或密码错误';
+    errEl.classList.add('show');
+    return;
+  }
+  
+  localStorage.setItem('xuejin_admin','1');
+  showAdmin();
+}
+
+function logout(){
+  localStorage.removeItem('xuejin_user');
+  currentUser = null;
+  showPage('page-login');
+}
+
+function adminLogout(){
+  localStorage.removeItem('xuejin_admin');
+  showPage('page-login');
+}
+
+// ====== Navigation ======
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ====== Home ======
+async function showHome(){
+  document.getElementById('home-username').textContent = currentUser.name;
+  
+  // Stats from Supabase
+  const {data:records} = await sb.from('quiz_records').select('*').eq('student_id',currentUser.id);
+  const myRecords = records||[];
+  const totalQ = myRecords.reduce((s,r)=>s+r.total,0);
+  const avgAcc = myRecords.length>0 ? Math.round(myRecords.reduce((s,r)=>s+r.accuracy,0)/myRecords.length) : 0;
+  
+  document.getElementById('home-total-q').textContent = totalQ;
+  document.getElementById('home-avg-score').textContent = avgAcc + '%';
+  document.getElementById('home-sessions').textContent = myRecords.length;
+  
+  // Subject grid - show all subjects for user's category
+  const cat = CATEGORIES.find(c=>c.id===currentUser.category);
+  const grid = document.getElementById('subject-grid');
+  grid.innerHTML = '';
+  
+  // Always show Chinese and Math first
+  const allSubjects = ['chinese','math'].concat(cat.subjects.filter(s=>s!=='chinese'&&s!=='math'));
+  
+  allSubjects.forEach(subjId=>{
+    const subj = SUBJECTS[subjId];
+    if(!subj) return;
+    const card = document.createElement('div');
+    card.className = 'subject-card';
+    card.onclick = ()=>openConfig(subjId);
+    card.innerHTML = `
+      <div class="subj-icon">${subj.icon}</div>
+      <div class="subj-name">${subj.name}</div>
+      <div class="subj-meta">${subj.desc}</div>
+    `;
+    grid.appendChild(card);
+  });
+  
+  showPage('page-home');
+}
+
+// ====== Config ======
+function openConfig(subjectId){
+  quizState.subject = subjectId;
+  quizState.difficulty = 'easy';
+  quizState.count = 50;
+  
+  document.getElementById('config-subject-name').textContent = SUBJECTS[subjectId].name;
+  document.getElementById('config-title').textContent = SUBJECTS[subjectId].name + ' · 刷题设置';
+  
+  // Reset selections
+  document.querySelectorAll('#difficulty-options .option-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.val==='easy');
+  });
+  document.querySelectorAll('#count-options .option-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.val==='50');
+  });
+  
+  showPage('page-config');
+}
+
+function selectOption(btn,group){
+  document.querySelectorAll('#'+group+'-options .option-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(group==='difficulty') quizState.difficulty = btn.dataset.val;
+  if(group==='count') quizState.count = parseInt(btn.dataset.val);
+}
+
+// ====== Quiz Engine ======
+function getQuestions(subject,difficulty,count){
+  const bank = SAMPLE_QUESTIONS[subject];
+  if(!bank || !bank[difficulty]) return [];
+  
+  let pool = [...bank[difficulty]];
+  
+  // If not enough questions, cycle through
+  const result = [];
+  let idx = 0;
+  while(result.length < count && pool.length > 0){
+    if(idx >= pool.length) idx = 0;
+    // Add some variation by shuffling options
+    const q = {...pool[idx]};
+    result.push(q);
+    idx++;
+  }
+  
+  // Shuffle
+  for(let i=result.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [result[i],result[j]]=[result[j],result[i]];
+  }
+  
+  return result.slice(0,count);
+}
+
+function startQuiz(){
+  const questions = getQuestions(quizState.subject,quizState.difficulty,quizState.count);
+  
+  if(questions.length === 0){
+    alert('该科目题目正在建设中，请稍后再试');
+    return;
+  }
+  
+  quizState.questions = questions;
+  quizState.answers = new Array(questions.length).fill(null);
+  quizState.currentIdx = 0;
+  quizState.startTime = Date.now();
+  
+  document.getElementById('quiz-subject-name').textContent = SUBJECTS[quizState.subject].name;
+  document.getElementById('quiz-total').textContent = questions.length;
+  
+  showPage('page-quiz');
+  renderQuestion();
+  startTimer();
+}
+
+let timerInterval = null;
+function startTimer(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    const elapsed = Math.floor((Date.now()-quizState.startTime)/1000);
+    const min = Math.floor(elapsed/60).toString().padStart(2,'0');
+    const sec = (elapsed%60).toString().padStart(2,'0');
+    document.getElementById('quiz-timer').textContent = min+':'+sec;
+  },1000);
+}
+
+function renderQuestion(){
+  const idx = quizState.currentIdx;
+  const q = quizState.questions[idx];
+  const total = quizState.questions.length;
+  
+  // Progress
+  document.getElementById('quiz-current').textContent = idx+1;
+  document.getElementById('quiz-progress-fill').style.width = ((idx+1)/total*100)+'%';
+  
+  // Question card
+  const card = document.getElementById('question-card');
+  const typeMap = {single:'单选题',multi:'多选题',judge:'判断题'};
+  const typeClass = {single:'single',multi:'multi',judge:'judge'};
+  
+  let html = `<div class="question-tag ${typeClass[q.type]}">${typeMap[q.type]}</div>`;
+  html += `<div class="question-text">${q.q}</div>`;
+  html += '<div class="options" id="options">';
+  
+  q.options.forEach((opt,i)=>{
+    const selected = quizState.answers[idx] && quizState.answers[idx].includes(i) ? 'selected' : '';
+    const label = String.fromCharCode(65+i);
+    html += `<div class="option-item ${selected}" onclick="selectAnswer(${i})" data-idx="${i}">
+      <div class="opt-label">${label}</div>
+      <div class="opt-text">${opt.replace(/^[A-D]\.\s*/,'')}</div>
+    </div>`;
+  });
+  
+  html += '</div>';
+  card.innerHTML = html;
+  
+  // Nav buttons
+  const nav = document.getElementById('quiz-nav');
+  if(idx === total-1){
+    nav.innerHTML = `<button class="nav-prev" onclick="prevQuestion()">上一题</button><button class="nav-submit" onclick="submitQuiz()">交卷</button>`;
+  } else {
+    nav.innerHTML = `<button class="nav-prev" onclick="prevQuestion()">上一题</button><button class="nav-next" onclick="nextQuestion()">下一题</button>`;
+  }
+  
+  // Disable prev on first
+  if(idx === 0){
+    nav.querySelector('.nav-prev').style.opacity = '0.4';
+    nav.querySelector('.nav-prev').style.pointerEvents = 'none';
+  }
+}
+
+function selectAnswer(optIdx){
+  const idx = quizState.currentIdx;
+  const q = quizState.questions[idx];
+  
+  if(q.type === 'multi'){
+    if(!quizState.answers[idx]) quizState.answers[idx] = [];
+    const arr = quizState.answers[idx];
+    const pos = arr.indexOf(optIdx);
+    if(pos > -1) arr.splice(pos,1);
+    else arr.push(optIdx);
+    arr.sort((a,b)=>a-b);
+  } else {
+    quizState.answers[idx] = [optIdx];
+  }
+  
+  // Update UI
+  document.querySelectorAll('#options .option-item').forEach(el=>{
+    const i = parseInt(el.dataset.idx);
+    const selected = quizState.answers[idx] && quizState.answers[idx].includes(i);
+    el.classList.toggle('selected', selected);
+  });
+}
+
+function prevQuestion(){
+  if(quizState.currentIdx > 0){
+    quizState.currentIdx--;
+    renderQuestion();
+  }
+}
+
+function nextQuestion(){
+  if(quizState.currentIdx < quizState.questions.length-1){
+    quizState.currentIdx++;
+    renderQuestion();
+  }
+}
+
+function submitQuiz(){
+  const unanswered = quizState.answers.filter(a=>a===null || a.length===0).length;
+  if(unanswered > 0){
+    if(!confirm(`还有${unanswered}道题未作答，确定要交卷吗？`)) return;
+  }
+  
+  clearInterval(timerInterval);
+  
+  // Calculate score
+  let correct = 0;
+  const wrongQuestions = [];
+  
+  quizState.questions.forEach((q,i)=>{
+    const userAns = quizState.answers[i] || [];
+    const correctAns = Array.isArray(q.answer) ? q.answer : [q.answer];
+    const userAnsStr = userAns.map(String).sort().join(',');
+    const correctAnsStr = correctAns.map(String).sort().join(',');
+    
+    if(userAnsStr === correctAnsStr){
+      correct++;
+    } else {
+      wrongQuestions.push({q,userAns,correctAns});
+    }
+  });
+  
+  const total = quizState.questions.length;
+  const accuracy = Math.round(correct/total*100);
+  const elapsed = Math.floor((Date.now()-quizState.startTime)/1000);
+  const minutes = Math.floor(elapsed/60);
+  const seconds = elapsed%60;
+  
+  // Save record to Supabase
+  await sb.from('quiz_records').insert([{
+    student_id:currentUser.id,
+    student_name:currentUser.name,
+    subject:quizState.subject,
+    subject_name:SUBJECTS[quizState.subject].name,
+    difficulty:quizState.difficulty,
+    total,
+    correct,
+    wrong:total-correct,
+    accuracy,
+    time_sec:elapsed,
+    time_str:minutes+'分'+(seconds>0?seconds+'秒':''),
+    wrong_questions:wrongQuestions,
+  }]);
+  
+  // Show result
+  showResult(correct,total,accuracy,minutes,seconds,wrongQuestions);
+}
+
+function showResult(correct,total,accuracy,minutes,seconds,wrongQuestions){
+  document.getElementById('result-subject').textContent = SUBJECTS[quizState.subject].name;
+  document.getElementById('result-score').textContent = correct;
+  document.getElementById('result-correct').textContent = correct;
+  document.getElementById('result-wrong').textContent = total-correct;
+  document.getElementById('result-total').textContent = total;
+  document.getElementById('result-accuracy').textContent = accuracy+'%';
+  document.getElementById('result-time').textContent = minutes+'分'+(seconds>0?seconds+'秒':'');
+  
+  // Wrong review
+  const review = document.getElementById('wrong-review');
+  if(wrongQuestions.length === 0){
+    review.innerHTML = '<div style="text-align:center;padding:20px;color:var(--success);font-size:16px">🎉 全部答对，太棒了！</div>';
+  } else {
+    let html = '';
+    wrongQuestions.forEach((item,i)=>{
+      const q = item.q;
+      const typeMap = {single:'单选题',multi:'多选题',judge:'判断题'};
+      const userAnsText = item.userAns.length > 0 ? item.userAns.map(a=>String.fromCharCode(65+a)).join(',') : '未作答';
+      const correctAnsText = item.correctAns.map(a=>String.fromCharCode(65+a)).join(',');
+      
+      html += `<div class="review-item">`;
+      html += `<div class="review-q">${i+1}. [${typeMap[q.type]}] ${q.q}</div>`;
+      html += `<div class="review-a your-wrong"><span class="label">你的答案：</span>${userAnsText}</div>`;
+      html += `<div class="review-a correct"><span class="label">正确答案：</span>${correctAnsText}</div>`;
+      
+      q.options.forEach((opt,j)=>{
+        const label = String.fromCharCode(65+j);
+        html += `<div style="font-size:12px;color:var(--body);padding:2px 10px">${label}. ${opt.replace(/^[A-D]\.\s*/,'')}</div>`;
+      });
+      
+      if(q.explanation){
+        html += `<div class="review-explanation">解析：${q.explanation}</div>`;
+      }
+      html += `</div>`;
+    });
+    review.innerHTML = html;
+  }
+  
+  showPage('page-result');
+}
+
+// ====== Admin (Supabase) ======
+async function showAdmin(){
+  // Fetch all students and records from Supabase
+  const [{data:users},{data:records}] = await Promise.all([
+    sb.from('students').select('*').order('created_at',{ascending:false}),
+    sb.from('quiz_records').select('*').order('created_at',{ascending:false})
+  ]);
+  const allUsers = users||[];
+  const allRecords = records||[];
+  
+  // Summary
+  document.getElementById('admin-student-count').textContent = allUsers.length;
+  document.getElementById('admin-total-questions').textContent = allRecords.reduce((s,r)=>s+r.total,0);
+  document.getElementById('admin-sessions').textContent = allRecords.length;
+  
+  // Student table
+  const tbody = document.getElementById('admin-tbody');
+  if(allUsers.length === 0){
+    document.getElementById('admin-empty').style.display = 'block';
+    document.getElementById('admin-table').style.display = 'none';
+  } else {
+    document.getElementById('admin-empty').style.display = 'none';
+    document.getElementById('admin-table').style.display = '';
+    
+    tbody.innerHTML = allUsers.map(u=>{
+      const userRecords = allRecords.filter(r=>r.student_id===u.id);
+      const totalQ = userRecords.reduce((s,r)=>s+r.total,0);
+      const avgAcc = userRecords.length>0 ? Math.round(userRecords.reduce((s,r)=>s+r.accuracy,0)/userRecords.length) : 0;
+      const lastRecord = userRecords.length>0 ? userRecords[0] : null;
+      const cat = CATEGORIES.find(c=>c.id===u.category);
+      const lastDate = lastRecord ? new Date(lastRecord.created_at).toLocaleString('zh-CN') : '-';
+      
+      return `<tr>
+        <td>${u.name}</td>
+        <td>${u.phone}</td>
+        <td>${cat?cat.fullName:'-'}</td>
+        <td>${userRecords.length}</td>
+        <td>${totalQ}</td>
+        <td>${avgAcc}%</td>
+        <td>${lastDate}</td>
+      </tr>`;
+    }).join('');
+  }
+  
+  // Detail table
+  const detailTbody = document.getElementById('admin-detail-tbody');
+  if(allRecords.length === 0){
+    detailTbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--gray)">暂无刷题记录</td></tr>';
+  } else {
+    const diffMap = {easy:'简单',medium:'中等',hard:'困难'};
+    detailTbody.innerHTML = allRecords.map(r=>{
+      const rDate = new Date(r.created_at).toLocaleString('zh-CN');
+      return `<tr>
+        <td>${r.student_name}</td>
+        <td>${r.subject_name}</td>
+        <td>${diffMap[r.difficulty]||r.difficulty}</td>
+        <td>${r.total}</td>
+        <td>${r.correct}</td>
+        <td>${r.accuracy}%</td>
+        <td>${r.time_str}</td>
+        <td>${rDate}</td>
+      </tr>`;
+    }).join('');
+  }
+  
+  showPage('page-admin');
+}
+
+// ====== Start ======
+init();
+</script>
+</body>
+</html>
