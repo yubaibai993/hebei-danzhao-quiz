@@ -358,11 +358,63 @@ input{outline:none;border:none}
 </style>
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://pnsqrgutwogjljyuiq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_2vD5BRO11X7CDpJZT59IDQ_CcsPnQjS';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ====== Local Storage Database (no backend needed) ======
+const DB = {
+  _students: null,
+  _records: null,
+  _admins: [{id:1, account:'xuejin', password:'xuejin2027'}],
+
+  load() {
+    if (this._students === null) {
+      try { this._students = JSON.parse(localStorage.getItem('xuejin_students') || '[]'); }
+      catch(e) { this._students = []; }
+      if (this._students.length === 0) {
+        this._students = [{id:1, name:'测试同学', phone:'13800000001', password:'123456', category:'construction', created_at:new Date().toISOString()}];
+        this.save();
+      }
+    }
+    if (this._records === null) {
+      try { this._records = JSON.parse(localStorage.getItem('xuejin_records') || '[]'); }
+      catch(e) { this._records = []; }
+    }
+  },
+  save() {
+    localStorage.setItem('xuejin_students', JSON.stringify(this._students));
+    localStorage.setItem('xuejin_records', JSON.stringify(this._records));
+  },
+  getStudents() { this.load(); return this._students; },
+  getRecords() { this.load(); return this._records; },
+  findStudent(phone, password) {
+    this.load();
+    return this._students.find(s => s.phone === phone && s.password === password) || null;
+  },
+  findStudentByPhone(phone) {
+    this.load();
+    return this._students.find(s => s.phone === phone) || null;
+  },
+  addStudent(name, phone, password, category) {
+    this.load();
+    const s = {id: Date.now(), name, phone, password, category, created_at: new Date().toISOString()};
+    this._students.push(s);
+    this.save();
+    return s;
+  },
+  getRecordsByStudent(studentId) {
+    this.load();
+    return this._records.filter(r => r.student_id === studentId);
+  },
+  addRecord(record) {
+    this.load();
+    record.id = Date.now();
+    record.created_at = new Date().toISOString();
+    this._records.unshift(record);
+    this.save();
+  },
+  findAdmin(account, password) {
+    return this._admins.find(a => a.account === account && a.password === password) || null;
+  }
+};
 </script>
 <div id="app">
 
@@ -1364,7 +1416,7 @@ async function init(){
   }
 }
 
-// ====== Auth (Supabase) ======
+// ====== Auth (Local Storage) ======
 async function handleRegister(){
   const name = document.getElementById('reg-name').value.trim();
   const phone = document.getElementById('reg-phone').value.trim();
@@ -1372,9 +1424,9 @@ async function handleRegister(){
   const cat = document.getElementById('reg-category').value;
   const errEl = document.getElementById('register-error');
   const btn = event.target;
-  
+
   errEl.classList.remove('show');
-  
+
   if(!name || !phone || !password || !cat){
     errEl.textContent='请填写所有信息';
     errEl.classList.add('show');
@@ -1390,12 +1442,12 @@ async function handleRegister(){
     errEl.classList.add('show');
     return;
   }
-  
+
   btn.disabled = true;
   btn.textContent = '注册中...';
-  
+
   // Check if phone exists
-  const {data:existing} = await sb.from('students').select('id').eq('phone',phone).maybeSingle();
+  const existing = DB.findStudentByPhone(phone);
   if(existing){
     errEl.textContent='该手机号已注册';
     errEl.classList.add('show');
@@ -1403,18 +1455,12 @@ async function handleRegister(){
     btn.textContent = '注 册';
     return;
   }
-  
+
   // Insert
-  const {data,error} = await sb.from('students').insert([{name,phone,password,category:cat}]).select().single();
+  const data = DB.addStudent(name, phone, password, cat);
   btn.disabled = false;
   btn.textContent = '注 册';
-  
-  if(error){
-    errEl.textContent='注册失败：'+error.message;
-    errEl.classList.add('show');
-    return;
-  }
-  
+
   currentUser = data;
   localStorage.setItem('xuejin_user',JSON.stringify(data));
   alert('注册成功！请返回登录');
@@ -1428,29 +1474,29 @@ async function handleLogin(){
   const password = document.getElementById('login-password').value.trim();
   const errEl = document.getElementById('login-error');
   const btn = event.target;
-  
+
   errEl.classList.remove('show');
-  
+
   if(!phone || !password){
     errEl.textContent='请输入手机号和密码';
     errEl.classList.add('show');
     return;
   }
-  
+
   btn.disabled = true;
   btn.textContent = '登录中...';
-  
-  const {data,error} = await sb.from('students').select('*').eq('phone',phone).eq('password',password).maybeSingle();
-  
+
+  const data = DB.findStudent(phone, password);
+
   btn.disabled = false;
   btn.textContent = '登 录';
-  
-  if(error || !data){
+
+  if(!data){
     errEl.textContent='手机号或密码错误';
     errEl.classList.add('show');
     return;
   }
-  
+
   currentUser = data;
   localStorage.setItem('xuejin_user',JSON.stringify(data));
   showHome();
@@ -1461,29 +1507,29 @@ async function handleAdminLogin(){
   const password = document.getElementById('admin-password').value.trim();
   const errEl = document.getElementById('admin-error');
   const btn = event.target;
-  
+
   errEl.classList.remove('show');
-  
+
   if(!account || !password){
     errEl.textContent='请输入管理员账号和密码';
     errEl.classList.add('show');
     return;
   }
-  
+
   btn.disabled = true;
   btn.textContent = '登录中...';
-  
-  const {data,error} = await sb.from('admins').select('*').eq('account',account).eq('password',password).maybeSingle();
-  
+
+  const data = DB.findAdmin(account, password);
+
   btn.disabled = false;
   btn.textContent = '管理端登录';
-  
-  if(error || !data){
+
+  if(!data){
     errEl.textContent='管理员账号或密码错误';
     errEl.classList.add('show');
     return;
   }
-  
+
   localStorage.setItem('xuejin_admin','1');
   showAdmin();
 }
@@ -1510,9 +1556,8 @@ function showPage(id){
 async function showHome(){
   document.getElementById('home-username').textContent = currentUser.name;
   
-  // Stats from Supabase
-  const {data:records} = await sb.from('quiz_records').select('*').eq('student_id',currentUser.id);
-  const myRecords = records||[];
+  // Stats from Local Storage
+  const myRecords = DB.getRecordsByStudent(currentUser.id);
   const totalQ = myRecords.reduce((s,r)=>s+r.total,0);
   const avgAcc = myRecords.length>0 ? Math.round(myRecords.reduce((s,r)=>s+r.accuracy,0)/myRecords.length) : 0;
   
@@ -1744,8 +1789,8 @@ function submitQuiz(){
   const minutes = Math.floor(elapsed/60);
   const seconds = elapsed%60;
   
-  // Save record to Supabase
-  await sb.from('quiz_records').insert([{
+  // Save record to Local Storage
+  DB.addRecord({
     student_id:currentUser.id,
     student_name:currentUser.name,
     subject:quizState.subject,
@@ -1758,7 +1803,7 @@ function submitQuiz(){
     time_sec:elapsed,
     time_str:minutes+'分'+(seconds>0?seconds+'秒':''),
     wrong_questions:wrongQuestions,
-  }]);
+  });
   
   // Show result
   showResult(correct,total,accuracy,minutes,seconds,wrongQuestions);
@@ -1806,15 +1851,11 @@ function showResult(correct,total,accuracy,minutes,seconds,wrongQuestions){
   showPage('page-result');
 }
 
-// ====== Admin (Supabase) ======
+// ====== Admin (Local Storage) ======
 async function showAdmin(){
-  // Fetch all students and records from Supabase
-  const [{data:users},{data:records}] = await Promise.all([
-    sb.from('students').select('*').order('created_at',{ascending:false}),
-    sb.from('quiz_records').select('*').order('created_at',{ascending:false})
-  ]);
-  const allUsers = users||[];
-  const allRecords = records||[];
+  // Fetch all students and records from Local Storage
+  const allUsers = DB.getStudents().slice().reverse();
+  const allRecords = DB.getRecords();
   
   // Summary
   document.getElementById('admin-student-count').textContent = allUsers.length;
